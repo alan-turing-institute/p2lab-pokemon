@@ -54,10 +54,8 @@ repos:
     rev: "v1.2.0"
     hooks:
       - id: mypy
-        files: src|tests
+        files: src
         args: []
-        additional_dependencies:
-          - pytest
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: "v0.9.0.2"

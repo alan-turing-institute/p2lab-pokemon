@@ -10,7 +10,7 @@ authors = [
 ]
 description = "a secret package for genetic optimisation of pokemon teams"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
   "Development Status :: 1 - Planning",
   "Intended Audience :: Science/Research",
@@ -20,7 +20,6 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.7",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -31,7 +30,10 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-  "typing_extensions >=3.7; python_version<'3.8'",
+    "requests==2.31.0",
+    "environs==4.1.0",
+    "websockets==10.3",
+    "python-dateutil==2.8.0"
 ]
 
 [project.optional-dependencies]
@@ -57,7 +59,7 @@ Homepage = "https://github.com/alan-turing-institute/P2-Lab"
 Discussions = "https://github.com/alan-turing-institute/P2-Lab/discussions"
 Changelog = "https://github.com/alan-turing-institute/P2-Lab/releases"
 [tool.hatch]
-version.path = "src/p2_lab/__init__.py"
+version.path = "src/p2lab/__init__.py"
 envs.default.dependencies = [
   "pytest",
   "pytest-cov",
@@ -79,7 +81,7 @@ testpaths = [
 
 
 [tool.coverage]
-run.source = ["p2_lab"]
+run.source = ["p2lab"]
 port.exclude_lines = [
   'pragma: no cover',
   '\.\.\.',
@@ -87,8 +89,8 @@ port.exclude_lines = [
 ]
 
 [tool.mypy]
-files = ["src", "tests"]
-python_version = "3.7"
+files = ["src"]
+python_version = "3.8"
 warn_unused_configs = true
 strict = true
 show_error_codes = true
@@ -97,10 +99,7 @@ warn_unreachable = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
-[[tool.mypy.overrides]]
-module = "p2_lab.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+
 
 
 [tool.ruff]
@@ -130,8 +129,8 @@ extend-ignore = [
   "PLR",    # Design related pylint codes
   "E501",   # Line too long
 ]
-target-version = "py37"
-typing-modules = ["p2_lab._compat.typing"]
+target-version = "py38"
+typing-modules = ["p2lab._compat.typing"]
 src = ["src"]
 unfixable = [
   "T20",  # Removes print statements

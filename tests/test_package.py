@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import p2_lab as m
-from p2_lab._compat.typing import Protocol, runtime_checkable
+import p2lab as m
+from p2lab._compat.typing import Protocol, runtime_checkable
 
 
 def test_version():
