@@ -23,3 +23,7 @@ This library, `p2lab`:
 
 - Aiming to be a python module to steer a bunch of bots into battling, collect
   the results, then run a genetic algorithm step!
+
+## Suggestions for faster running
+
+Using a local pokemon showdown server run with `--no-security` for bot vs. bot training to be faster.
