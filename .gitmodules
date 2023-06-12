@@ -1,0 +1,3 @@
+[submodule "showdown"]
+	path = showdown
+	url = git@github.com:phinate/showdown.git
