@@ -1,0 +1,1 @@
+pokemon-showdown generate-team gen3ou
