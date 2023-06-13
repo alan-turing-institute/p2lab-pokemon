@@ -31,6 +31,7 @@ An interface for optimising pokemon teams using genetic algorithms!
 - Aiming to be a python module to steer a bunch of bots into battling, collect
   the results, then run a genetic algorithm step!
 
+
 ## Running the battles with Poke-env 
 
 - [ ] TODO: Complete this documentation to be tidy
@@ -42,3 +43,8 @@ node pokemon-showdown start --no-security
 
 Then in Poke-env run TBD, but to test it works go into the `poke_env/examples`
 folder and run `python simple_battle.py` to see a battle in action!
+
+## Suggestions for faster running
+
+Using a local pokemon showdown server run with `--no-security` for bot vs. bot training to be faster.
+
