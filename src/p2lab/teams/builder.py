@@ -27,6 +27,7 @@ class Builder(Teambuilder):
         
     def build_N_teams_from_poke_pool(self, N_teams):
         self.teams = [np.random.choice(self.poke_pool, size=6, replace=False) for _ in range(N_teams)]
+        
 
     def yield_team(self):
         return self.teams[np.random.choice(len(self.teams))]
