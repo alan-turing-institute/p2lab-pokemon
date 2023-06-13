@@ -1,3 +1,6 @@
 [submodule "showdown"]
 	path = showdown
 	url = git@github.com:phinate/showdown.git
+[submodule "poke-env"]
+	path = poke-env
+	url = git@github.com:AoifeHughes/poke-env.git
