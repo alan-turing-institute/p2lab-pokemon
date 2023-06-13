@@ -146,3 +146,6 @@ isort.required-imports = ["from __future__ import annotations"]
 
 [project.scripts]
 p2lab = "P2Lab.__main__:main"
+
+[tool.setuptools]
+package_dir = ["src"]
