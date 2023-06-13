@@ -100,8 +100,6 @@ disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
 
-
-
 [tool.ruff]
 select = [
   "E", "F", "W", # flake8
