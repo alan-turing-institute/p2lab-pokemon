@@ -9,8 +9,8 @@ from .teams.team import Team
 from tqdm import tqdm
 
 N_generations = 10 # Number of generations to run
-N_teams = 20 # Number of teams to generate per generation
-N_battles = 1 # Number of battles to run per team
+N_teams = 5 # Number of teams to generate per generation
+N_battles = 3 # Number of battles to run per team
 
 async def main_loop():
     builder = Builder(N_seed_teams=N_teams)
