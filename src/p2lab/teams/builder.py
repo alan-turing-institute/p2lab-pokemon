@@ -20,12 +20,8 @@ class Builder(Teambuilder):
                 self.teams.append(self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding)))
         self.poke_pool = np.array(self.teams).flatten()
         
+    def build_N_teams_from_poke_pool(self, N_teams):
+        self.teams 
 
     def yield_team(self):
         return np.random.choice(self.teams)
-
-    def make_team(self):
-        pass
-    
-    def make_N_teams(self, N):
-        return [self.make_team() for _ in range(N)]
