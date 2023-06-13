@@ -159,3 +159,6 @@ Thumbs.db
 
 # vscode
 .vscode/
+
+# venv
+venv-pokemon/
