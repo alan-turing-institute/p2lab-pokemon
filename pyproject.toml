@@ -33,7 +33,8 @@ dependencies = [
     "requests==2.31.0",
     "environs==4.1.0",
     "websockets==10.3",
-    "python-dateutil==2.8.0"
+    "python-dateutil==2.8.0",
+    "tqdm"
 ]
 
 [project.optional-dependencies]
