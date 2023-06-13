@@ -22,9 +22,9 @@ async def main_loop():
     # Main expected loop
     while curr_gen < N_generations:
         await evaluator.evaluate_teams(teams)
-        #poke_pool = [] # List of Pokemon 
-        #teams = [] # list of teams (of Pokemon)
-        #curr_gen += 1
+        teams = builder.generate_new_teams()
+        curr_gen += 1
+
 
 def main():
     asyncio.get_event_loop().run_until_complete(main_loop())

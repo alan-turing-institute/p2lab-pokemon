@@ -31,3 +31,20 @@ class Builder(Teambuilder):
 
     def yield_team(self):
         return self.teams[np.random.choice(len(self.teams))]
+
+    def generate_new_teams(self):
+        self.breed_teams()
+        self.mutate_teams()
+
+
+    def mutate_team(self, team, mutation_rate=0.1):
+        # Each pokemon in a team has a given probability of being replaced by a random pokemon from the pool
+
+        for pokemon in team:
+            if np.random.random() < mutation_rate:
+                new_pokemon = np.random.choice(self.poke_pool)
+                # If the pokemon is already in the team, replace it with a random pokemon from the pool
+                while new_pokemon in team:
+                    new_pokemon = np.random.choice(self.poke_pool)
+                # Replace the pokemon
+                team[np.where(team == pokemon)[0][0]] = new_pokemon
