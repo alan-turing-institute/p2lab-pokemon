@@ -2,8 +2,8 @@
 TODO: Write some docs here.
 """
 
-from .teams import Builder
-from .evaluator import Evaluator
+from .teams.builder import Builder
+from .evaluator.poke_env import PokeEnv
 
 def main():
 
