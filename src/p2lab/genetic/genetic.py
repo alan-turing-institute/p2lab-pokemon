@@ -39,7 +39,9 @@ def genetic_team(
         new_teams = crossover(teams, fitness, num_teams, num_pokemon)
 
         # Mutate the new teams
-        teams = mutate(new_teams, p=0.1, pokemon_population=pokemon_population)  # need to parameterise mutation prob
+        teams = mutate(
+            new_teams, p=0.1, pokemon_population=pokemon_population
+        )  # need to parameterise mutation prob
 
         # Generate matches from list of teams
         matches = generate_matches(teams)
