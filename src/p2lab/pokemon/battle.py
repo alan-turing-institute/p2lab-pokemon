@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 
-def run_battles(matches: np.ndarray) -> list[int]:
+def run_battles(matches: np.ndarray) -> np.ndarray:
     """
     Runs several matches.
 
@@ -18,12 +18,12 @@ def run_battles(matches: np.ndarray) -> list[int]:
     Returns:
         _type_: _description_
     """
-    results = []
+    results = np.ndarray([])
     for match in matches:
-        results.append(run_battle(match))
+        results = np.append(results, run_battle(match))
     return results
 
 
 def run_battle(match: np.ndarray) -> int:
     print(match)  # delete this line, it's here to pass pre-commit
-    return 0  # this function should always run 0 or 1
+    return 0  # this function should always return 0 or 1
