@@ -23,10 +23,21 @@ An interface for optimising pokemon teams using genetic algorithms!
 
 - Wicked fast at simulating battles via pokemon showdown engine
 - A potential replacement for the battle bot by pmargilia
-
 ###  Genetic algorithm library: TBD
 
 ### This library, `p2lab`:
 
 - Aiming to be a python module to steer a bunch of bots into battling, collect
   the results, then run a genetic algorithm step!
+
+## Running the battles with Poke-env 
+
+- [ ] TODO: Complete this documentation to be tidy
+
+From within the pokemon showdown directory, run the following command to start
+```bash
+node pokemon-showdown start --no-security
+```
+
+Then in Poke-env run TBD, but to test it works go into the `poke_env/examples`
+folder and run `python simple_battle.py` to see a battle in action!
