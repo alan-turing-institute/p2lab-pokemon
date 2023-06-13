@@ -23,6 +23,7 @@ An interface for optimising pokemon teams using genetic algorithms!
 
 - Wicked fast at simulating battles via pokemon showdown engine
 - A potential replacement for the battle bot by pmargilia
+- https://poke-env.readthedocs.io/en/stable/getting_started.html
 ###  Genetic algorithm library: TBD
 
 ### This library, `p2lab`:

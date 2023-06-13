@@ -143,3 +143,6 @@ isort.required-imports = ["from __future__ import annotations"]
 [tool.ruff.per-file-ignores]
 "tests/**" = ["T20"]
 "noxfile.py" = ["T20"]
+
+[project.scripts]
+p2lab = "P2Lab.__main__:main"
