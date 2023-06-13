@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 from subprocess import check_output
 import copy
+from tqdm import tqdm
 import numpy as np
 from poke_env.teambuilder import Teambuilder
 from .team import Team
@@ -21,7 +22,8 @@ class Builder(Teambuilder):
             ]
         else:
             self.teams = []
-            for _ in range(N_seed_teams):
+            print("Generating seed teams")
+            for _ in tqdm(range(N_seed_teams)):
                 self.teams.append(self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding)))
         self.poke_pool = np.array(self.teams).flatten()
         
@@ -36,7 +38,7 @@ class Builder(Teambuilder):
 
     def generate_new_teams(self):
         self.last_generation =  copy.deepcopy(self.teams)
-        self.teams = self.breed_teams()
+        self.breed_teams()
         # TODO: Make this fancier
         #self.mutate_teams()
 
@@ -51,7 +53,7 @@ class Builder(Teambuilder):
             t2 = t2.get_teamlist()
             teams.append(self.breed_team(t1,t2))
         self.teams = teams
-        self.duplicate_detect()
+        self.duplicate_detect() # Prob should take out or move this somewhere else 
             
     def breed_team(self, t1,t2):
         # REALLY BAD DUPLICATION PREVENTION

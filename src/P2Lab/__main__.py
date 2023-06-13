@@ -8,7 +8,7 @@ from .evaluator.poke_env import PokeEnv
 from .teams.team import Team 
 from tqdm import tqdm
 
-N_generations = 10 # Number of generations to run
+N_generations = 5 # Number of generations to run
 N_teams = 5 # Number of teams to generate per generation
 N_battles = 3 # Number of battles to run per team
 
@@ -21,11 +21,13 @@ async def main_loop():
     evaluator = PokeEnv(n_battles=N_battles)
 
     # Main expected loop
-    while curr_gen < N_generations:
+    print("Starting main loop and running on Generation: ")
+    for _ in tqdm(range(N_generations)):
         await evaluator.evaluate_teams(teams)
-        teams = builder.generate_new_teams()
+        builder.generate_new_teams()
+        teams = builder.get_teams()
         curr_gen += 1
-        break
+
 
 
 def main():
