@@ -13,7 +13,7 @@ from p2lab.pokemon.team import Team
 # Psuedocode for the genetic algorithm, some placeholder functions below to
 # be deleted
 def genetic_team(
-    population: list[str],  # list of all valid pokemon names
+    pokemon_population: list[str],  # list of all valid pokemon names
     num_pokemon: int = 6,
     num_teams: int = 100,
     fitness_func: Callable[[list[Team], np.ndarary, list[int]], list[float]] = BTmodel,
@@ -21,7 +21,7 @@ def genetic_team(
 ) -> None:
     # Generate initial group of teams and matchups
     teams = generate_teams(
-        population,
+        pokemon_population,
         num_pokemon,
         num_teams,
     )
@@ -39,7 +39,7 @@ def genetic_team(
         new_teams = crossover(teams, fitness, num_teams, num_pokemon)
 
         # Mutate the new teams
-        teams = mutate(new_teams)  # need to parameterise mutation prob
+        teams = mutate(new_teams, p=0.1, pokemon_population=pokemon_population)  # need to parameterise mutation prob
 
         # Generate matches from list of teams
         matches = generate_matches(teams)
@@ -50,21 +50,19 @@ def genetic_team(
         # Compute fitness
         fitness = fitness_func(teams, matches, results)
 
-        # Optionally:
-
 
 # Placeholders:
 
 
 # Consider seeding this?
 def generate_teams(
-    population: list[str],
+    pokemon_population: list[str],
     num_pokemon: int,
     num_teams: int,
 ) -> list[Team]:
     teams = []
     for _i in range(num_teams):
-        pokemon = random.sample(population=population, k=num_pokemon)
+        pokemon = random.sample(population=pokemon_population, k=num_pokemon)
         teams.append(Team(pokemon=pokemon))
     return teams
 
@@ -122,7 +120,9 @@ def crossover(
     return new_teams
 
 
-def mutate(teams: list[Team], p: float = 0.1) -> list[Team]:
+def mutate(teams: list[Team], p: float, pokemon_population: list[str]) -> list[Team]:
     for team in teams:
-        team.random_mutate(p=p)  # will need to be parameterised with a prob
+        team.random_mutate(
+            p=p, pokemon_population=pokemon_population
+        )  # will need to be parameterised with a prob
     return teams
