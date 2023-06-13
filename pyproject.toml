@@ -33,10 +33,12 @@ dependencies = [
     "requests==2.31.0",
     "environs==4.1.0",
     "websockets==10.3",
-    "python-dateutil==2.8.0"
+    "python-dateutil==2.8.0",
+    "numpy==1.24.3"
 ]
 
 [project.optional-dependencies]
+
 test = [
   "pytest >=6",
   "pytest-cov >=3",
