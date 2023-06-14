@@ -35,9 +35,9 @@ dependencies = [
     "websockets==10.3",
     "python-dateutil==2.8.0",
     "numpy==1.24.3",
-	"networkx",
-	"tqdm",
-	"pytest"
+    "networkx",
+    "tqdm",
+    "pytest"
 ]
 
 [project.optional-dependencies]
