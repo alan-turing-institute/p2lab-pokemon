@@ -20,4 +20,6 @@ class Team:
         return "]".join([mon.formatted for mon in self.pokemon])
     
     def to_df(self):
-        return pd.DataFrame([re.split('\||,',s) for s in  re.split('\]', self.to_packed_str())])
+        # TODO Put in the columns or something
+        df = pd.DataFrame([re.split('\||,',s) for s in  re.split('\]', self.to_packed_str())])
+        return df
