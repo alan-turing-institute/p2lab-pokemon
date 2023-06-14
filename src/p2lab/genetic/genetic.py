@@ -6,6 +6,8 @@ from typing import Callable
 import numpy as np
 
 from p2lab.genetic.fitness import BTmodel
+from p2lab.genetic.matching import dense
+
 from p2lab.pokemon.battle import run_battles
 from p2lab.pokemon.team import Team
 
@@ -63,10 +65,13 @@ def generate_teams(
     num_pokemon: int,
     num_teams: int,
 ) -> list[Team]:
+
+	# TODO Use pre-made teambuilder 
     teams = []
     for _i in range(num_teams):
         pokemon = random.sample(population=pokemon_population, k=num_pokemon)
         teams.append(Team(pokemon=pokemon))
+
     return teams
 
 
@@ -80,8 +85,14 @@ def generate_matches(teams: list[Team]) -> np.ndarray:
     track them each round
 
     Actually, team IDs can just index the current team list?
+
+	Outputs:
+	
+		np.ndarray shape (N_matches, 2) The columns are team ids.
+
     """
-    return np.zeros(shape=(len(teams), 2))
+
+	return dense(teams)
 
 
 def crossover(
