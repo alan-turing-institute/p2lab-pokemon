@@ -17,16 +17,13 @@ def BTmodel(
     in sports contests.
 
     They do this by assuming that the probability of team 1 beating team 1
-    has the following form:total
+    has the following form:
 
     Pr(team1>team2) = exp(a_1) / (exp(a_1) + exp(a_2))
 
     Where a_1 is team 1's latent ability.
 
-    The abilities are estimated as parameters of a logit model with the
-    following form:
-
-    logit(Pr(team1_wins)) = a_1 - a_2
+    The abilities are estimated via an iterative algorithm.
 
     Which means we only need access to win/loss data and match data in order
     to produce estimates
