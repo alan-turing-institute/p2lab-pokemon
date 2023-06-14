@@ -5,6 +5,7 @@ import numpy as np
 from itertools import combinations
 from poke_env.player import Player, RandomPlayer
 from poke_env import PlayerConfiguration
+from tqdm import tqdm
 class PokeEnv:
     def __init__(self, n_battles=100):
         self.p1 = RandomPlayer(PlayerConfiguration("Player 1", None), battle_format="gen8doublescustomgame")
@@ -13,7 +14,6 @@ class PokeEnv:
         pass
 
     async def evaluate_teams(self, teams):
-        print("Running matches...")
         match_ups = [c for c in combinations(np.arange(len(teams)), 2)]
 
         for t1, t2 in match_ups:
