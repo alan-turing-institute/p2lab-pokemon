@@ -29,6 +29,7 @@ def build_crossover_fn(
         num_teams: int,
         num_pokemon: int,
         crossover_prob: float,
+        allow_all: bool = False,
     ) -> list[Team]:
         """
         A crossover function.
@@ -42,6 +43,8 @@ def build_crossover_fn(
             crossover_prob: The crossover probability. Defines the chance at
                             which two teams are crossed over instead of simply
                             being kept. Should be reasonably high
+            allow_all: Allows all members of a team to be crossed over when randomly
+                       choosing the number. Should be True if num_pokemon is < 3.
         """
 
         # Output vector
@@ -70,6 +73,7 @@ def build_crossover_fn(
                     team1=team1_pokemon,
                     team2=team2_pokemon,
                     num_pokemon=num_pokemon,
+                    allow_all=allow_all,
                     **kwargs,
                 )
 
@@ -95,6 +99,7 @@ def locus_swap(
     team1: list[str],
     team2: list[str],
     num_pokemon: int,
+    allow_all: bool,
     locus: int = None,
 ) -> tuple(list[str], list[str]):
     """
@@ -109,12 +114,17 @@ def locus_swap(
         team1: List of pokemon in team 1
         team2: List of pokemon in team 2
         num_pokemon: Number of pokemon in each team
+        allow_all: Whether to allow all pokemon to be swapped when ranomly
+                   choosing the locus point.
         locus: Locus point at which to perform swaps
     """
 
-    # If locus has not been chosen, choose
+    # If locus has not been chosen, randomly choose
     if locus is None:
-        locus = random.sample(range(1, num_pokemon - 1), k=1)[0]
+        # If allow_all is true, the teams may just completely swap members
+        # or not swap at all. This changes the higher level crossover probs!
+        n = 0 if allow_all else 1
+        locus = random.sample(range(n, num_pokemon - n), k=1)[0]
 
     # Check validity of locus
     assert locus > 0
@@ -137,6 +147,7 @@ def slot_swap(
     team1: list[str],
     team2: list[str],
     num_pokemon: int,
+    allow_all: bool,
     k: int = None,
 ) -> tuple(list[str], list[str]):
     """
@@ -151,12 +162,17 @@ def slot_swap(
         team1: List of pokemon in team 1
         team2: List of pokemon in team 2
         num_pokemon: Number of pokemon in each team
+        allow_all: Whether to allow all pokemon to be swapped when ranomly
+                   choosing the value of k.
         k: Number of slots in which to switch pokemon
     """
 
     # If locus has not been chosen, choose
     if k is None:
-        k = random.sample(range(1, num_pokemon - 1), k=1)[0]
+        # If allow_all is true, the teams may just completely swap members
+        # or not swap at all. This changes the higher level crossover probs!
+        n = 0 if allow_all else 1
+        k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
     # Check validity of locus
     assert k > 0
@@ -235,8 +251,8 @@ def mutate(
     teams: list[Team],
     num_pokemon: int,
     mutate_prob: float,
-    use_fitnesses: bool,
     pokemon_population: list[str],
+    allow_all: bool,
     k: int = None,
 ):
     """
@@ -248,6 +264,8 @@ def mutate(
         num_pokemon: The number of pokemon in each team
         mutate_prob: Probability of mutation to occur
         pokemon_population: The population of all possible pokemon
+        allow_all: Whether to allow all pokemon to be swapped when ranomly
+                   choosing the locus point.
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
@@ -256,7 +274,10 @@ def mutate(
         if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
-                k = random.sample(range(num_pokemon))[0]
+                # If allow_all is true, the teams may just completely swap members
+                # or not swap at all. This changes the higher level crossover probs!
+                n = 0 if allow_all else 1
+                k = random.sample(range(n, num_pokemon - n))[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
@@ -273,6 +294,7 @@ def fitness_mutate(
     num_pokemon: int,
     fitness: np.array,
     pokemon_population: list[str],
+    allow_all: bool,
     k: int = None,
 ):
     """
@@ -287,6 +309,8 @@ def fitness_mutate(
         num_pokemon: The number of pokemon in each team
         fitness: Team fitnesses
         pokemon_population: The population of all possible pokemon
+        allow_all: Whether to allow all pokemon to be swapped when ranomly
+                   choosing the locus point.
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
@@ -297,7 +321,10 @@ def fitness_mutate(
         ):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
-                k = random.sample(range(num_pokemon))[0]
+                # If allow_all is true, the teams may just completely swap members
+                # or not swap at all. This changes the higher level crossover probs!
+                n = 0 if allow_all else 1
+                k = random.sample(range(n, num_pokemon - n))[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
