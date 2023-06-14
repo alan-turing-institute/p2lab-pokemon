@@ -17,12 +17,12 @@ def main():
     teams = [builder.yield_team() for n in range(N_teams)]
     evaluator = PokeEnv()
     # Main expected loop
-    while curr_gen < N_generations:
-        team_fitness = evaluator.evaluate_teams(teams)
+    # while curr_gen < N_generations:
+    #     team_fitness = evaluator.evaluate_teams(teams)
 
-        poke_pool = []  # List of Pokemon
-        teams = []  # list of teams (of Pokemon)
-        curr_gen += 1
+    #     poke_pool = []  # List of Pokemon
+    #     teams = []  # list of teams (of Pokemon)
+    #     curr_gen += 1
 
 
 if __name__ == "__main__":

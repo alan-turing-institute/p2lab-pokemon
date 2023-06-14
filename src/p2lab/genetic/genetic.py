@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import random
 from typing import Callable
 
 import numpy as np
 
-from p2lab.genetic.fitness import BTmodel
+from p2lab.genetic.matching import dense
+from p2lab.genetic.operations import fitness_mutate, mutate
+from p2lab.pokemon.battle import run_battles
 from p2lab.pokemon.team import Team
 
 
@@ -12,14 +15,16 @@ from p2lab.pokemon.team import Team
 # be deleted
 def genetic_team(
     pokemon_population: list[str],  # list of all valid pokemon names
-    generate_teams: Callable,
-    generate_matches: Callable,
-    run_battles: Callable,
-    crossover_fn: Callable,
-    fitness_func: Callable[[list[Team], np.ndarray, list[int]], list[float]] = BTmodel,
-    num_pokemon: int = 6,
-    num_teams: int = 100,
-    max_evolutions: int = 500,
+    num_pokemon: int,
+    num_teams: int,
+    fitness_fn: Callable,
+    crossover_fn: Callable = None,
+    crossover_prob: float = 0.95,
+    mutate_prob: float = 0.01,
+    mutate_with_fitness: bool = False,
+    mutate_k=None,
+    allow_all=False,
+    num_evolutions: int = 500,
     fitness_kwargs: dict | None = None,
 ) -> None:
     """
@@ -78,7 +83,9 @@ def genetic_team(
     results = run_battles(matches)
 
     # Compute fitness
-    fitness = fitness_fn(teams, matches, results, **kwargs)
+    if fitness_kwargs is None:
+        fitness_kwargs = {}
+    fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
     # Genetic Loop
     for _iter in range(num_evolutions):
@@ -122,6 +129,38 @@ def genetic_team(
         results = run_battles(matches)
 
         # Compute fitness
-        if fitness_kwargs is None:
-            fitness_kwargs = {}
-        fitness = fitness_func(teams, matches, results, **kwargs)
+        fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
+
+
+# Consider seeding this?
+def generate_teams(
+    pokemon_population: list[str],
+    num_pokemon: int,
+    num_teams: int,
+) -> list[Team]:
+    # TODO Use pre-made teambuilder
+    teams = []
+    for _i in range(num_teams):
+        pokemon = random.sample(population=pokemon_population, k=num_pokemon)
+        teams.append(Team(pokemon=pokemon))
+
+    return teams
+
+
+def generate_matches(teams: list[Team]) -> np.ndarray:
+    """
+
+    First column should be team IDs for player 1
+    Second column should be team IDs for player 2
+
+    Team IDs can be generated fresh each round, but we'll need to
+    track them each round
+
+    Actually, team IDs can just index the current team list?
+
+        Outputs:
+
+                np.ndarray shape (N_matches, 2) The columns are team ids.
+
+    """
+    return dense(teams)
