@@ -1,5 +1,5 @@
 from __future__ import annotations
-from poke_env.player import Player, RandomPlayer
+
 import numpy as np
 
 

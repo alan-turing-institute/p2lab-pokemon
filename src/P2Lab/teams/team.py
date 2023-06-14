@@ -8,10 +8,10 @@ class Team:
 
     def get_teamlist(self):
         return self.pokemon
-    
+
     def get_fitness(self):
         return self.fitness
-    
+
     def set_fitness(self, x):
         self.fitness = x
 
