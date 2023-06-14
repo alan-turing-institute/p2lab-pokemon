@@ -162,3 +162,4 @@ Thumbs.db
 
 # Ignore data
 outputs/
+*.png

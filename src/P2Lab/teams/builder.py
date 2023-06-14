@@ -25,9 +25,18 @@ class Builder(Teambuilder):
             print("Generating seed teams")
             for _ in tqdm(range(N_seed_teams)):
                 try:
-                    n_team = self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding))
+                    poss_team = check_output(f"pokemon-showdown generate-team {format}", shell=True)
+                    try:
+                        check_output(f"pokemon-showdown validate-team {format} ", shell=True,input=poss_team).decode(sys.stdout.encoding)
+                    except Exception as e:
+                        print(e)
+                        print("Error validating team... skipping to next")
+                        continue
+                    n_team = self.parse_showdown_team(poss_team.decode(sys.stdout.encoding))
+                    if len(n_team) !=6:
+                        continue
                     self.teams.append(n_team)
-                except TypeError as e:
+                except Exception as e:
                     print("Error generating team... skipping to next")
 
                 
