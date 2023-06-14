@@ -1,0 +1,308 @@
+from __future__ import annotations
+
+import math
+import random
+from typing import Callable
+
+import numpy as np
+
+from p2lab.pokemon.team import Team
+
+
+### Crossover Operations
+def build_crossover_fn(
+    crossover_method: Callable,
+    **kwargs,
+) -> Callable:
+    """
+    This function constructs a crossover function based on its inputs.
+
+    Arguments:
+        crossover_method: Function that defines the method of crossover
+                          used. See below
+        **kwargs: Arguments passed to the crossover method
+    """
+
+    def crossover_fn(
+        teams: list[Team],
+        fitness: np.ndarray,
+        num_teams: int,
+        num_pokemon: int,
+        crossover_prob: float,
+    ) -> list[Team]:
+        """
+        A crossover function.
+
+        Args:
+            teams: A list containing all team objects
+            fitness: A numpy array of shape (N_team,) containing team fitness
+                     scores
+            num_teams: The number of teams
+            num_pokemon: The number of Pokemon in each team
+            crossover_prob: The crossover probability. Defines the chance at
+                            which two teams are crossed over instead of simply
+                            being kept. Should be reasonably high
+        """
+        
+        # Output vector
+        new_teams = []
+
+        # Each loop produces 2 new teams, so needs half this number to produce
+        # enough teams.
+        for _i in range(math.ceil(num_teams / 2)):
+            # Sample conditional on fitness
+            teams_old = np.random.choice(teams, size=2, replace=False, p=fitness)
+            team1_old = teams_old[0]
+            team2_old = teams_old[1]
+
+            # Extract list of pokemon to crossover
+            team1_pokemon = team1_old.pokemon
+            team2_pokemon = team2_old.pokemon
+
+            # Crossover occurs with parameterised probability
+            crossover = np.random.choice(
+                a=[True, False], p=[crossover_prob, 1 - crossover_prob]
+            )
+
+            # Perform crossover
+            if crossover:
+                team1_pokemon, team2_pokemon = crossover_method(
+                    team1=team1_pokemon,
+                    team2=team2_pokemon,
+                    num_pokemon=num_pokemon,
+                    **kwargs,
+                )
+
+            # Build new teams
+            team1_new = Team(pokemon=team1_pokemon)
+            team2_new = Team(pokemon=team2_pokemon)
+
+            # Append to output
+            new_teams = [*new_teams, team1_new, team2_new]
+
+        # Check output is correct length. One team will need
+        # removing if N_teams is an odd number. Probably just
+        # best to run an even number of teams lol
+        if num_teams % 2 != 0:
+            num_teams.pop()
+
+        return new_teams
+
+    return crossover_fn
+
+
+def locus_swap(
+    team1: list[str],
+    team2: list[str],
+    num_pokemon: int,
+    locus: int = None,
+) -> tuple(list[str], list[str]):
+    """
+    A method of performing the crossover. Pick a 'locus' point: this
+    becomes the point at which two input lists are sliced.
+
+    Two new lists are then produced from the sliced lists.
+
+    If no locus point is supplied, this will be chosen randomly.
+
+    Args:
+        team1: List of pokemon in team 1
+        team2: List of pokemon in team 2
+        num_pokemon: Number of pokemon in each team
+        locus: Locus point at which to perform swaps
+    """
+
+    # If locus has not been chosen, choose
+    if locus is None:
+        locus = random.sample(range(1, num_pokemon - 1), k=1)[0]
+
+    # Check validity of locus
+    assert locus > 0
+    assert locus < (num_pokemon - 1)
+
+    # Split teams into halves
+    team1_p1 = team1[0:locus]
+    team1_p2 = team1[locus:num_pokemon]
+    team2_p1 = team2[0:locus]
+    team2_p2 = team2[locus:num_pokemon]
+
+    # Recombine
+    team1_new = team1_p1 + team2_p2
+    team2_new = team2_p1 + team1_p2
+
+    return team1_new, team2_new
+
+
+def slot_swap(
+    team1: list[str],
+    team2: list[str],
+    num_pokemon: int,
+    k: int = None,
+) -> tuple(list[str], list[str]):
+    """
+    A method of performing the crossover. This method randomly
+    chooses k points in the lists, then swaps them over.
+
+    Two new lists are then produced from the sliced lists.
+
+    If a value for k is not chosen, it will be chosen randomly.
+
+    Args:
+        team1: List of pokemon in team 1
+        team2: List of pokemon in team 2
+        num_pokemon: Number of pokemon in each team
+        k: Number of slots in which to switch pokemon
+    """
+
+    # If locus has not been chosen, choose
+    if k is None:
+        k = random.sample(range(1, num_pokemon - 1), k=1)[0]
+
+    # Check validity of locus
+    assert k > 0
+    assert k < (num_pokemon - 1)
+
+    # Select swap indices
+    indices = list(range(num_pokemon))
+    swap_indices = random.sample(indices, k=k)
+
+    # Temporarily convert teams to np.arrays because list indexing in Python
+    # still hasn't caught up to R
+    team1 = np.array(team1)
+    team2 = np.array(team2)
+
+    # Get pokemon to swap out
+    team1_swaps = team1[swap_indices]
+    team2_swaps = team2[swap_indices]
+
+    # Swap the new pokemon in
+    team1[swap_indices] = team2_swaps
+    team2[swap_indices] = team1_swaps
+
+    return list(team1), list(team2)
+
+
+def sample_swap(
+    team1: list[str],
+    team2: list[str],
+    num_pokemon: int,
+    with_replacement: bool = True,
+) -> tuple(list[str], list[str]):
+    """
+    A method of performing the crossover. This method treats the pokemon
+    in the two teams as a population and samples from them to create two new
+    teams.
+
+    Can be done with or without replacement. Generally more interesting with
+    replacement and so defaults to with replacement.
+
+    Args:
+        team1: List of pokemon in team 1
+        team2: List of pokemon in team 2
+        num_pokemon: Number of pokemon in each team
+        with_replacement: Whether to sample with our without replacement.
+    """
+
+    # Population to sample from and indices
+    population = np.array([*team1, *team2])
+    indices = list(range(num_pokemon * 2))
+
+    # Sample indices (since teams may have overlapping members)
+    team1_indices = np.random.choice(
+        indices,
+        size=num_pokemon,
+        replace=with_replacement,
+    )
+
+    # For team 2, change behaviour conditional on replacement
+    if with_replacement:
+        team2_indices = list(
+            np.random.choice(
+                indices,
+                size=num_pokemon,
+                replace=with_replacement,
+            )
+        )
+    else:
+        team2_indices = list(set(indices) - set(team1_indices))
+
+    # Return teams
+    return list(population[team1_indices]), list(population(team2_indices))
+
+
+### Mutation Operations
+def mutate(
+    teams: list[Team],
+    num_pokemon: int,
+    mutate_prob: float,
+    use_fitnesses: bool,
+    pokemon_population: list[str],
+    k:int = None,
+):
+    """
+    A mutation operation. At random, k members of a team are swapped with k
+    pokemeon in the wider population of pokemon.
+
+    Args:
+        teams: A list of teams
+        num_pokemon: The number of pokemon in each team
+        mutate_prob: Probability of mutation to occur
+        pokemon_population: The population of all possible pokemon
+        k: Number of team members to mutate. If set to None, this number will
+           be random.
+    """
+    for team in teams:
+        
+        # Each team faces a random chance of mutation
+        if np.random.choice([True, False], size=None, p=[mutate_prob,1-mutate_prob]):
+            
+            # If k has not been chosen, choose randomly how many team members to mutate
+            if k is None:
+                k = random.sample(range(num_pokemon))[0]
+            
+            # Randomly swap k members of the team out with pokemon from the general pop
+            mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
+            new_pokemon = np.random.choice(pokemon_population, size=k, replace=True) #open to parameterising the replace
+            team.pokemon[mutate_indices] = new_pokemon
+    
+    return teams
+
+
+def fitness_mutate(
+    teams: list[Team],
+    num_pokemon: int,
+    fitness: np.array,
+    pokemon_population: list[str],
+    k:int = None,
+):
+    """
+    A mutation operation. Does the same as regular mutation, except that
+    mutate probabilites are now inverse to fitness scores.
+    
+    Should either be used prior to crossover, or without using any kind of
+    crossover.
+
+    Args:
+        teams: A list of teams
+        num_pokemon: The number of pokemon in each team
+        fitness: Team fitnesses
+        pokemon_population: The population of all possible pokemon
+        k: Number of team members to mutate. If set to None, this number will
+           be random.
+    """
+    for index, team in enumerate(teams):
+        
+        # Each team faces a random chance of mutation
+        if np.random.choice([True, False], size=None, p=[1-fitness[index],fitness[index]]):
+            
+            # If k has not been chosen, choose randomly how many team members to mutate
+            if k is None:
+                k = random.sample(range(num_pokemon))[0]
+            
+            # Randomly swap k members of the team out with pokemon from the general pop
+            mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
+            new_pokemon = np.random.choice(pokemon_population, size=k, replace=True) #open to parameterising the replace
+            team.pokemon[mutate_indices] = new_pokemon
+    
+    return teams
+
