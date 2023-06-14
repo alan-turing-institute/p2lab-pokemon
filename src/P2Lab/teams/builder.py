@@ -15,7 +15,7 @@ class Builder(Teambuilder):
     """
     The team builder
     """
-    def __init__(self, N_seed_teams=2, teams=None, format="gen2randombattle"):
+    def __init__(self, N_seed_teams=2, teams=None, format="gen7randombattle"):
         if teams:
             self.teams = [
                 self.join_team(self.parse_showdown_team(team)) for team in teams
@@ -24,7 +24,14 @@ class Builder(Teambuilder):
             self.teams = []
             print("Generating seed teams")
             for _ in tqdm(range(N_seed_teams)):
-                self.teams.append(self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding)))
+
+                try:
+                    n_team = self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding))
+                    self.teams.append(n_team)
+                except TypeError as e:
+                    print("Error generating team... skipping to next")
+
+                
         self.poke_pool = np.array(self.teams).flatten()
         
     def build_N_teams_from_poke_pool(self, N_teams):

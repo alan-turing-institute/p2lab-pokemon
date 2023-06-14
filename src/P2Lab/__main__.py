@@ -8,9 +8,9 @@ from .evaluator.poke_env import PokeEnv
 from .teams.team import Team 
 from tqdm import tqdm
 
-N_generations = 5 # Number of generations to run
-N_teams = 5 # Number of teams to generate per generation
-N_battles = 3 # Number of battles to run per team
+N_generations = 10 # Number of generations to run
+N_teams = 2 # Number of teams to generate per generation
+N_battles = 10 # Number of battles to run per team
 
 async def main_loop():
     builder = Builder(N_seed_teams=N_teams)
@@ -27,8 +27,6 @@ async def main_loop():
         builder.generate_new_teams()
         teams = builder.get_teams()
         curr_gen += 1
-
-
 
 def main():
     asyncio.get_event_loop().run_until_complete(main_loop())
