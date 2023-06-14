@@ -15,7 +15,7 @@ class Builder(Teambuilder):
     """
     The team builder
     """
-    def __init__(self, N_seed_teams=2, teams=None, format="gen3randombattle"):
+    def __init__(self, N_seed_teams=2, teams=None, format="gen7anythinggoes"):
         if teams:
             self.teams = [
                 self.join_team(self.parse_showdown_team(team)) for team in teams
