@@ -143,7 +143,6 @@ def generate_teams(
     for _i in range(num_teams):
         pokemon = random.sample(population=pokemon_population, k=num_pokemon)
         teams.append(Team(pokemon=pokemon))
-
     return teams
 
 
