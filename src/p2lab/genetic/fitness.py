@@ -41,9 +41,9 @@ def BTmodel(
     # Estimate logit model
     print(results)
 
-        # Check for convergence
-        if np.sum(np.abs(old_abilities - abilities)) < tol:
-            break
+    # # Check for convergence
+    # if np.sum(np.abs(old_abilities - abilities)) < tol:
+    #     break
 
     return abilities
 

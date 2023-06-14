@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 
-class TeamRecorder():
+class TeamRecorder:
     def __init__(self) -> None:
         pass
-    
+
     def create_folder(self, f):
         Path(f"outputs/{f}").mkdir(parents=True, exist_ok=True)
 

@@ -3,18 +3,22 @@ The team builder
 """
 from __future__ import annotations
 
+import copy
 import sys
 from subprocess import check_output
-import copy
-from tqdm import tqdm
+
 import numpy as np
 from poke_env.teambuilder import Teambuilder
+from tqdm import tqdm
+
 from .team import Team
+
 
 class Builder(Teambuilder):
     """
     The team builder
     """
+
     def __init__(self, N_seed_teams=2, teams=None, format="gen7anythinggoes"):
         if teams:
             self.teams = [
@@ -24,21 +28,35 @@ class Builder(Teambuilder):
             self.teams = []
             print("Generating seed teams")
             for _ in tqdm(range(N_seed_teams)):
-                poss_team = check_output(f"pokemon-showdown generate-team {format}", shell=True)
+                poss_team = check_output(
+                    f"pokemon-showdown generate-team {format}", shell=True
+                )
                 try:
-                    check_output(f"pokemon-showdown validate-team {format} ", shell=True,input=poss_team)
+                    check_output(
+                        f"pokemon-showdown validate-team {format} ",
+                        shell=True,
+                        input=poss_team,
+                    )
                 except Exception as e:
                     print("Error validating team... skipping to next")
                     continue
-                n_team = self.parse_showdown_team(check_output("pokemon-showdown export-team ",input=poss_team, shell=True).decode(sys.stdout.encoding))
-                if len(n_team)!=6:
-                    raise Exception("Team not of length 6")
-                self.teams.append(n_team)                 
+                n_team = self.parse_showdown_team(
+                    check_output(
+                        "pokemon-showdown export-team ", input=poss_team, shell=True
+                    ).decode(sys.stdout.encoding)
+                )
+                if len(n_team) != 6:
+                    msg = "Team not of length 6"
+                    raise Exception(msg)
+                self.teams.append(n_team)
         self.poke_pool = np.array(self.teams).flatten()
 
     def build_N_teams_from_poke_pool(self, N_teams):
-        self.teams = [Team(np.random.choice(self.poke_pool, size=6, replace=False)) for _ in range(N_teams)]
-        
+        self.teams = [
+            Team(np.random.choice(self.poke_pool, size=6, replace=False))
+            for _ in range(N_teams)
+        ]
+
     def get_teams(self):
         return self.teams
 
@@ -46,32 +64,31 @@ class Builder(Teambuilder):
         return self.teams[np.random.choice(len(self.teams))]
 
     def generate_new_teams(self):
-        self.last_generation =  copy.deepcopy(self.teams)
+        self.last_generation = copy.deepcopy(self.teams)
         self.breed_teams()
         # TODO: Make this fancier
-        #self.mutate_teams()
-
+        # self.mutate_teams()
 
     def breed_teams(self):
         teams = []
-        for i in range(len(self.teams)):
+        for _i in range(len(self.teams)):
             probs = np.array([t.get_fitness() for t in self.teams])
-            probs = probs/np.sum(probs)
+            probs = probs / np.sum(probs)
             t1, t2 = np.random.choice(self.teams, 2, p=probs, replace=False)
             t1 = t1.get_teamlist()
             t2 = t2.get_teamlist()
-            teams.append(self.breed_team(t1,t2))
+            teams.append(self.breed_team(t1, t2))
         self.teams = teams
-        self.duplicate_detect() # Prob should take out or move this somewhere else 
-            
-    def breed_team(self, t1,t2):
+        self.duplicate_detect()  # Prob should take out or move this somewhere else
+
+    def breed_team(self, t1, t2):
         # REALLY BAD DUPLICATION PREVENTION
-        # TODO: FIX ASAP      
-        poss_pokes = np.concatenate((t1,t2))
+        # TODO: FIX ASAP
+        poss_pokes = np.concatenate((t1, t2))
         names = [str(p).split("|")[0] for p in poss_pokes]
         new_team_names = np.random.choice(list(set(names)), size=6, replace=False)
-        n2p = {n:p for n,p in zip(names,poss_pokes)}
-        new_team =[n2p[n] for n in new_team_names]
+        n2p = dict(zip(names, poss_pokes))
+        new_team = [n2p[n] for n in new_team_names]
         return Team(new_team)
 
     def duplicate_detect(self):
