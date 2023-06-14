@@ -19,7 +19,8 @@ def genetic_team(
     num_pokemon: int = 6,
     num_teams: int = 100,
     fitness_func: Callable[[list[Team], np.ndarary, list[int]], list[float]] = BTmodel,
-    max_iter: int = 500,
+    max_evolutions: int = 500,
+    **kwargs,
 ) -> None:
     # Generate initial group of teams and matchups
     teams = generate_teams(
@@ -33,10 +34,10 @@ def genetic_team(
     results = run_battles(matches)
 
     # Compute fitness
-    fitness = fitness_func(teams, matches, results)
+    fitness = fitness_func(teams, matches, results, **kwargs)
 
     # Genetic Loop
-    for _iter in range(max_iter):
+    for _iter in range(max_evolutions):
         # Crossover based on fitness func
         new_teams = crossover(teams, fitness, num_teams, num_pokemon)
 
@@ -52,7 +53,7 @@ def genetic_team(
         results = run_battles(matches)
 
         # Compute fitness
-        fitness = fitness_func(teams, matches, results)
+        fitness = fitness_func(teams, matches, results, **kwargs)
 
 
 # Placeholders:
