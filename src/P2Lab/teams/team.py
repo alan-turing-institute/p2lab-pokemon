@@ -1,5 +1,6 @@
 from __future__ import annotations
-
+import pandas as pd
+import re
 
 class Team:
     def __init__(self, pokemon) -> None:
@@ -17,3 +18,6 @@ class Team:
 
     def to_packed_str(self):
         return "]".join([mon.formatted for mon in self.pokemon])
+    
+    def to_df(self):
+        return pd.DataFrame([re.split('\||,',s) for s in  re.split('\]', self.to_packed_str())])

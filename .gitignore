@@ -159,3 +159,6 @@ Thumbs.db
 
 # vscode
 .vscode/
+
+# Ignore data
+outputs/
