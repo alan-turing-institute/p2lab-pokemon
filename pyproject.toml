@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 
 [project]
-name = "P2Lab"
+name = "p2lab"
 authors = [
   { name = "Scientists of the P2 Laboratory", email = "nsimpson@turing.ac.uk" },
 ]
@@ -148,4 +148,4 @@ isort.required-imports = ["from __future__ import annotations"]
 "noxfile.py" = ["T20"]
 
 [project.scripts]
-p2lab = "P2Lab.__main__:main"
+p2lab = "p2lab.__main__:main"
