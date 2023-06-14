@@ -43,7 +43,7 @@ def build_crossover_fn(
                             which two teams are crossed over instead of simply
                             being kept. Should be reasonably high
         """
-        
+
         # Output vector
         new_teams = []
 
@@ -237,7 +237,7 @@ def mutate(
     mutate_prob: float,
     use_fitnesses: bool,
     pokemon_population: list[str],
-    k:int = None,
+    k: int = None,
 ):
     """
     A mutation operation. At random, k members of a team are swapped with k
@@ -252,19 +252,19 @@ def mutate(
            be random.
     """
     for team in teams:
-        
         # Each team faces a random chance of mutation
-        if np.random.choice([True, False], size=None, p=[mutate_prob,1-mutate_prob]):
-            
+        if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
                 k = random.sample(range(num_pokemon))[0]
-            
+
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
-            new_pokemon = np.random.choice(pokemon_population, size=k, replace=True) #open to parameterising the replace
+            new_pokemon = np.random.choice(
+                pokemon_population, size=k, replace=True
+            )  # open to parameterising the replace
             team.pokemon[mutate_indices] = new_pokemon
-    
+
     return teams
 
 
@@ -273,12 +273,12 @@ def fitness_mutate(
     num_pokemon: int,
     fitness: np.array,
     pokemon_population: list[str],
-    k:int = None,
+    k: int = None,
 ):
     """
     A mutation operation. Does the same as regular mutation, except that
     mutate probabilites are now inverse to fitness scores.
-    
+
     Should either be used prior to crossover, or without using any kind of
     crossover.
 
@@ -291,18 +291,19 @@ def fitness_mutate(
            be random.
     """
     for index, team in enumerate(teams):
-        
         # Each team faces a random chance of mutation
-        if np.random.choice([True, False], size=None, p=[1-fitness[index],fitness[index]]):
-            
+        if np.random.choice(
+            [True, False], size=None, p=[1 - fitness[index], fitness[index]]
+        ):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
                 k = random.sample(range(num_pokemon))[0]
-            
+
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
-            new_pokemon = np.random.choice(pokemon_population, size=k, replace=True) #open to parameterising the replace
+            new_pokemon = np.random.choice(
+                pokemon_population, size=k, replace=True
+            )  # open to parameterising the replace
             team.pokemon[mutate_indices] = new_pokemon
-    
-    return teams
 
+    return teams
