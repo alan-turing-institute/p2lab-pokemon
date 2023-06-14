@@ -17,7 +17,6 @@ RECORD=True
 async def main_loop():
     builder = Builder(N_seed_teams=N_teams)
     builder.build_N_teams_from_poke_pool(N_teams)
-    teams = builder.get_teams()
     curr_gen = 0 # Current generation
     evaluator = PokeEnv(n_battles=N_battles)
     recorder = TeamRecorder()
@@ -26,10 +25,9 @@ async def main_loop():
     print("Starting main loop and running on Generation: ")
     for _ in tqdm(range(N_generations)):
         if RECORD:
-            recorder.record_teams(teams, curr_gen) 
-        await evaluator.evaluate_teams(teams)
+            recorder.record_teams(builder.get_teams(), curr_gen) 
+        await evaluator.evaluate_teams(builder.get_teams())
         builder.generate_new_teams()
-        teams = builder.get_teams()
         curr_gen += 1
 
 def main():

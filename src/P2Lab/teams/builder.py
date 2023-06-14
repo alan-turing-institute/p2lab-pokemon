@@ -24,7 +24,6 @@ class Builder(Teambuilder):
             self.teams = []
             print("Generating seed teams")
             for _ in tqdm(range(N_seed_teams)):
-
                 try:
                     n_team = self.parse_showdown_team(check_output(f"pokemon-showdown generate-team {format}| pokemon-showdown export-team", shell=True).decode(sys.stdout.encoding))
                     self.teams.append(n_team)
