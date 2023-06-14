@@ -1,5 +1,7 @@
 """
 """
+from __future__ import annotations
+
 
 class PokeEnv:
     def __init__(self):

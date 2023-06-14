@@ -147,7 +147,8 @@ def win_percentages(
         team_ids=team_ids,
         matches=matches,
     )
-    return total_wins / total_matches
+    win_percentages = total_wins / total_matches
+    return win_percentages / np.sum(win_percentages)  # standardise to sum to 1
 
 
 # Some helper functions for use across different candidate fitness functions:
