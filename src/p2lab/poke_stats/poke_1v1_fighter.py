@@ -123,7 +123,10 @@ def dummy_gen_pop() -> list(str):
 def dummy_duel(poke_1: str, poke_2: str) -> bool:
     """Dummy duel method"""
     rng = np.random.default_rng(seed=int("".join(str(ord(c)) for c in poke_1 + poke_2)))
-    return rng.integers(0, 2)
+    prob = rng.random(1)[0]
+    # print(prob)
+    # print(1 - prob)
+    return rng.choice(a=[True, False], p=[prob, 1 - prob])
 
 
 def dummy_duel_to_convergence(
@@ -156,8 +159,8 @@ def dummy_duel_to_convergence(
     poke_win_1 = 1  # Start with one win each to avoid /0 errors....
     poke_win_2 = 1
     ratios = []
-    print(cutoff)
-    while count < cutoff:  # or variance
+    # print(cutoff)
+    while count < cutoff and variance > var_threshold:  # or variance
         # print(count)
         count += 1
         if dummy_duel(poke_1, poke_2):
@@ -165,10 +168,12 @@ def dummy_duel_to_convergence(
         else:
             poke_win_2 += 1
         ratios.append(poke_win_1 / poke_win_2)
-        if len(ratios) < look_back:
-            variance = np.var(ratios)
-        else:
-            variance = np.var(ratios[-look_back:])
+        if count > 2:
+            if len(ratios) < look_back:
+                variance = np.var(ratios)
+            else:
+                variance = np.var(ratios[-look_back:])
+    print(variance)
     return poke_win_1 / count, poke_win_2 / count
 
 
@@ -201,14 +206,14 @@ def main(**kwargs):
     avg_win_ratio = np.mean(res_arr, axis=0)
     for i in range(len(poke_names)):
         poke_dict[poke_names[i]]["average_win_ratio"] = avg_win_ratio[i]
-    print(poke_dict)
-    print(f"for Magikarp:")
+    # print(poke_dict)
+    print("for Magikarp:")
     print(poke_dict["magikarp"])
     return poke_dict
 
 
 if __name__ == "__main__":
     # Pars hardcoded in for now as should be single run.
-    pars = {"var_threshold": 1e-2, "look_back": 2, "cutoff": 100}
+    pars = {"var_threshold": 1e-14, "look_back": 2, "cutoff": 100}
 
     main(**pars)
