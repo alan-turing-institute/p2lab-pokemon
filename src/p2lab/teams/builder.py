@@ -13,14 +13,14 @@ from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
 from .team import Team
-
+from . import gen_filter
 
 class Builder(Teambuilder):
     """
     The team builder
     """
 
-    def __init__(self, N_seed_teams=2, teams=None, play_format="gen7anythinggoes", team_selection_format=None, team_size=3):
+    def __init__(self, N_seed_teams=2, teams=None, play_format="gen7anythinggoes", team_selection_format=None, team_size=3, filter=True):
         self.play_format = play_format
         self.team_selection_format = team_selection_format
         self.team_size = team_size
@@ -37,6 +37,8 @@ class Builder(Teambuilder):
                 teams = list(tqdm(pool.imap(self.generate_teams_via_showdown, [self.team_size for _ in range(N_seed_teams)]), total=N_seed_teams))
             self.teams = [t for t in teams if t is not None]
         self.poke_pool = np.array(self.teams).flatten()
+        if filter:
+            self.poke_pool = [p for p in self.poke_pool if gen_filter.is_in(p, gen_filter.pokemon_gen1)]
 
     def build_N_teams_from_poke_pool(self, N_teams):
         self.teams = [

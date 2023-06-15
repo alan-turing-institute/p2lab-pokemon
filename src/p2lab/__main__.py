@@ -19,7 +19,7 @@ RECORD = True
 
 
 async def main_loop():
-    builder = Builder(N_seed_teams=N_teams, team_selection_format="gen3randombattle", team_size=T_size)
+    builder = Builder(N_seed_teams=N_teams*10, team_selection_format="gen3randombattle", team_size=T_size)
     builder.build_N_teams_from_poke_pool(N_teams)
     curr_gen = 0  # Current generation
     evaluator = PokeEnv(n_battles=N_battles)
