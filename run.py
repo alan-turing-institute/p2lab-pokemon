@@ -57,9 +57,29 @@ def generate_pool(
 
     if export:
         with Path.open(filename, "w") as f:
-            f.write("\n".join(pool))
+            packed = "\n".join([mon.formatted for mon in pool])
+            # convert using pokemon-showdown export-team
+            human_readable = check_output(
+                "pokemon-showdown export-team ",
+                input=packed,
+                shell=True,
+                universal_newlines=True,
+            )
+            f.write(human_readable)
 
     return pool
+
+
+def import_pool(filename):
+    with Path.open(filename, "r") as f:
+        human_readable = f.read()
+    teams = []
+    # loop over every 6 lines and parse the team
+    for _i in range(0, len(human_readable.splitlines()), 6):
+        team = Builder().parse_showdown_team(human_readable)
+        teams.append(team)
+
+    return np.array(teams).flatten()
 
 
 def generate_teams(pool, num_teams, team_size=6):
@@ -96,13 +116,16 @@ async def run_battles(
         results.append((p1.n_won_battles, p2.n_won_battles))
         p1.reset_battles()
         p2.reset_battles()
-
     return results
 
 
 async def main():
-    pool = generate_pool(10)
-    print(len(pool))
+    pool = generate_pool(10, export=True)
+    new_pool = import_pool(filename="pool.txt")
+    print(f"pool: {pool}")
+    print(f"pool shape: {pool.shape}")
+    print(f"new pool: {new_pool}")
+    print(f"new pool shape: {new_pool.shape}")
     teams = generate_teams(pool, 3)
     matches = dense(teams)
     print(f"matches: {matches}")
