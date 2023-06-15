@@ -40,11 +40,22 @@ class Builder(Teambuilder):
         if filter:
             self.poke_pool = [p for p in self.poke_pool if gen_filter.is_in(p, gen_filter.pokemon_gen1)]
 
+            # hack to ensure only 1 of each pokemon!
+            upokes = []
+            unames = []
+            names = [str(p).split("|")[0] for p in self.poke_pool]
+            for p in self.poke_pool:
+                if str(p).split("|")[0] in unames:
+                    continue
+                upokes.append(p)
+                unames.append(str(p).split("|")[0])
+
     def build_N_teams_from_poke_pool(self, N_teams):
         self.teams = [
             Team(np.random.choice(self.poke_pool, size=self.team_size, replace=False))
             for _ in range(N_teams)
         ]
+
 
 
     def generate_teams_via_showdown(self, _):
