@@ -1,0 +1,15 @@
+num_pokemon: 2
+num_teams: 100
+fitness_fn: BTmodel
+crossover_method: slot_swap
+crossover_kwargs:
+  k: 1 #swap 1 pokemon between teams
+crossover_prob: 0.75 #a team will need to appear 4 times in the pool to avoid crossover
+mutate_prob: 0.01 #this value will be ignored due to the below
+mutate_with_fitness: False
+mutate_k: 1 #mutate 1 pokemon at a time
+allow_all: True # redundant
+num_evolutions: 100
+fitness_kwargs:
+  max_iter: 50
+  tol: 0.01

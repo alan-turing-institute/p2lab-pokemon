@@ -1,0 +1,13 @@
+num_pokemon: 1
+num_teams: 151 #is there a parameter for non-random selection?
+fitness_fn: BTmodel #?
+crossover_method: null # needs selection-only to be merged
+crossover_prob: 1 #this value will be ignored due to the above
+mutate_prob: 0.01 #this value will be ignored due to the below
+mutate_with_fitness: True
+mutate_k: 1
+allow_all: True # redundant due to no crossover and the above
+num_evolutions: 100
+fitness_kwargs:
+  max_iter: 50
+  tol: 0.01
