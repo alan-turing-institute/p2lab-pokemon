@@ -6,7 +6,7 @@ from typing import Callable
 
 import numpy as np
 
-from p2lab.pokemon.team import Team
+from p2lab.team import Team
 
 
 ### Crossover Operations
@@ -88,7 +88,7 @@ def build_crossover_fn(
         # removing if N_teams is an odd number. Probably just
         # best to run an even number of teams lol
         if num_teams % 2 != 0:
-            num_teams.pop()
+            new_teams.pop()
 
         return new_teams
 
@@ -137,8 +137,8 @@ def locus_swap(
     team2_p2 = team2[locus:num_pokemon]
 
     # Recombine
-    team1_new = team1_p1 + team2_p2
-    team2_new = team2_p1 + team1_p2
+    team1_new = [*team1_p1, *team2_p2]
+    team2_new = [*team2_p1, *team1_p2]
 
     return team1_new, team2_new
 
@@ -281,6 +281,7 @@ def mutate(
 
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
+            print(mutate_indices)
             new_pokemon = np.random.choice(
                 pokemon_population, size=k, replace=True
             )  # open to parameterising the replace

@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
+from p2lab.genetic.operations import build_crossover_fn, mutate, slot_swap
 from p2lab.team import Team
 
 
@@ -93,48 +94,87 @@ def generate_teams(pool, num_teams, team_size=6):
 async def run_battles(
     matches,
     teams,
+    player_1,
+    player_2,
     battles_per_match=1,
-    bot_strategy="random",
-    battle_format="gen7anythinggoes",
     progress_bar=True,
 ):
-    if bot_strategy == "random":
-        p1 = RandomPlayer(
-            PlayerConfiguration("Player 1", None), battle_format=battle_format
-        )
-        p2 = RandomPlayer(
-            PlayerConfiguration("Player 2", None), battle_format=battle_format
-        )
-    else:
-        msg = f"bot strategy not implemented: should be one of ['random'] but got {bot_strategy}"
-        raise Exception(msg)
-
     results = []
     for t1, t2 in tqdm(matches) if progress_bar else matches:
-        p1.update_team(teams[t1].to_packed_str())
-        p2.update_team(teams[t2].to_packed_str())
-        await p1.battle_against(p2, n_battles=battles_per_match)
-        results.append((p1.n_won_battles, p2.n_won_battles))
-        p1.reset_battles()
-        p2.reset_battles()
+        player_1.update_team(teams[t1].to_packed_str())
+        player_2.update_team(teams[t2].to_packed_str())
+        await player_1.battle_against(player_2, n_battles=battles_per_match)
+        results.append((player_1.n_won_battles, player_2.n_won_battles))
+        player_1.reset_battles()
+        player_2.reset_battles()
     return np.array(results)
 
 
-async def main():
+async def main(
+    num_generations=10,
+    num_teams=3,
+    team_size=6,
+    battles_per_match=10,
+    battle_format="gen7anythinggoes",
+):
     pool = generate_pool(10, export=True)
-    new_pool = import_pool(filename="pool.txt")
+    # new_pool = import_pool(filename="pool.txt")
     print(f"pool: {pool}")
     print(f"pool shape: {pool.shape}")
-    print(f"new pool: {new_pool}")
-    print(f"new pool shape: {new_pool.shape}")
-    teams = generate_teams(pool, 3)
+    # print(f"new pool: {new_pool}")
+    # print(f"new pool shape: {new_pool.shape}")
+    teams = generate_teams(pool, num_teams=num_teams, team_size=team_size)
     matches = dense(teams)
     print(f"matches: {matches}")
     print(f"matches shape: {matches.shape}")
-    results = await run_battles(matches, teams, battles_per_match=10)
+    player_1 = RandomPlayer(
+        PlayerConfiguration("Player 1", None), battle_format=battle_format
+    )
+    player_2 = RandomPlayer(
+        PlayerConfiguration("Player 2", None), battle_format=battle_format
+    )
+    results = await run_battles(
+        matches, teams, player_1, player_2, battles_per_match=battles_per_match
+    )
     print(f"results: {results}")
     fitness = win_percentages(teams, matches, results)
     print(f"fitness: {fitness}")
+
+    crossover_fn = build_crossover_fn(slot_swap)
+    for _ in range(num_generations):
+        # Crossover based on fitness func
+        new_teams = crossover_fn(
+            teams=teams,
+            fitness=fitness,
+            num_teams=num_teams,
+            num_pokemon=team_size,
+            crossover_prob=0.5,
+            allow_all=False,
+        )
+
+        # Mutate the new teams
+        teams = mutate(
+            teams=new_teams,
+            num_pokemon=team_size,
+            mutate_prob=0.1,
+            pokemon_population=pool,
+            allow_all=False,
+            k=1,
+        )
+
+        # Generate matches from list of teams
+        matches = dense(teams)
+
+        # Run simulations
+        results = await run_battles(
+            matches, teams, player_1, player_2, battles_per_match=battles_per_match
+        )
+
+        # Compute fitness
+        fitness = win_percentages(teams, matches, results)
+
+    # return the best team
+    return teams[np.argmax(fitness)].to_packed_str()
 
 
 # test the pool generation
