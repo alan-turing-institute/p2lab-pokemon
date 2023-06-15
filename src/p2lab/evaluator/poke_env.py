@@ -8,6 +8,7 @@ from itertools import combinations
 import numpy as np
 from poke_env import PlayerConfiguration
 from poke_env.player import RandomPlayer
+from poke_env.player.baselines import SimpleHeuristicsPlayer
 from tqdm import tqdm
 
 SHOW_MATCH_PROGRESS = True
@@ -15,10 +16,10 @@ SHOW_MATCH_PROGRESS = True
 
 class PokeEnv:
     def __init__(self, n_battles=100, battle_format="gen7anythinggoes"):
-        self.p1 = RandomPlayer(
+        self.p1 = SimpleHeuristicsPlayer(
             PlayerConfiguration("Player 1", None), battle_format=battle_format
         )
-        self.p2 = RandomPlayer(
+        self.p2 = SimpleHeuristicsPlayer(
             PlayerConfiguration("Player 2", None), battle_format=battle_format
         )
         self.n_battles = n_battles

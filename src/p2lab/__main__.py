@@ -10,16 +10,17 @@ from tqdm import tqdm
 from .evaluator.poke_env import PokeEnv
 from .stats.team_recorder import TeamRecorder
 from .teams.builder import Builder
-
+from .teams import gen1
 N_generations = 50  # Number of generations to run
-N_teams = 25  # Number of teams to generate per generation
+N_teams = 200  # Number of teams to generate per generation
 N_battles = 3  # Number of battles to run per team
 T_size = 6  # Number of pokemon per team
 RECORD = True
 
 
 async def main_loop():
-    builder = Builder(N_seed_teams=100, team_selection_format="gen3randombattle", team_size=T_size)
+    master_teams_str = gen1.gen1
+    builder = Builder(N_seed_teams=1000, team_selection_format="gen3randombattle", team_size=T_size, teams=master_teams_str)
     builder.build_N_teams_from_poke_pool(N_teams)
     curr_gen = 0  # Current generation
     evaluator = PokeEnv(n_battles=N_battles)

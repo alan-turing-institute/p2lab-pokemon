@@ -7,7 +7,7 @@ import copy
 import sys
 from subprocess import check_output
 import multiprocessing
-
+import subprocess
 import numpy as np
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
@@ -27,28 +27,25 @@ class Builder(Teambuilder):
         if team_selection_format is None:
             team_selection_format = format
         if teams:
-            self.teams = [
-                self.join_team(self.parse_showdown_team(team)) for team in teams
-            ]
+                self.poke_pool = self.parse_showdown_team(teams)
         else:
             self.teams = []
             print("Generating seed teams")
             with multiprocessing.Pool(processes=8) as pool:
                 teams = list(tqdm(pool.imap(self.generate_teams_via_showdown, [self.team_size for _ in range(N_seed_teams)]), total=N_seed_teams))
             self.teams = [t for t in teams if t is not None]
-        self.poke_pool = np.array(self.teams).flatten()
+            self.poke_pool = np.array(self.teams).flatten()
         if filter:
             self.poke_pool = [p for p in self.poke_pool if gen_filter.is_in(p, gen_filter.pokemon_gen1)]
-
             # hack to ensure only 1 of each pokemon!
             upokes = []
             unames = []
-            names = [str(p).split("|")[0] for p in self.poke_pool]
             for p in self.poke_pool:
                 if str(p).split("|")[0] in unames:
                     continue
                 upokes.append(p)
                 unames.append(str(p).split("|")[0])
+            self.poke_pool = upokes
 
     def build_N_teams_from_poke_pool(self, N_teams):
         self.teams = [
@@ -67,7 +64,7 @@ class Builder(Teambuilder):
             check_output(
                 f"pokemon-showdown validate-team {self.play_format} ",
                 shell=True,
-                input=poss_team,
+                input=poss_team, stderr=subprocess.DEVNULL
             )
 
             n_team = self.parse_showdown_team(
