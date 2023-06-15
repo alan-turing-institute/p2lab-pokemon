@@ -11,6 +11,7 @@ from poke_env.player import SimpleHeuristicsPlayer
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
+from p2lab.gen_data import gen_1_pokemon
 from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.genetic.operations import build_crossover_fn, locus_swap, mutate
@@ -72,14 +73,20 @@ def generate_pool(
     return pool
 
 
-def import_pool(filename):
-    with Path.open(filename, "r") as f:
-        human_readable = f.read()
-    teams = []
-    # loop over every 6 lines and parse the team
-    for _i in range(0, len(human_readable.splitlines()), 6):
-        team = Builder().parse_showdown_team(human_readable)
-        teams.append(team)
+def import_pool(filename=None, team_string=None):
+    if filename is None and team_string is None:
+        msg = "Must provide either filename or teams"
+        raise Exception(msg)
+    if filename is not None:
+        with Path.open(filename, "r") as f:
+            human_readable = f.read()
+        teams = []
+        # loop over every 6 lines and parse the team
+        for _i in range(0, len(human_readable.splitlines()), 6):
+            team = Builder().parse_showdown_team(human_readable)
+            teams.append(team)
+    elif team_string is not None:
+        teams = Builder().parse_showdown_team(team_string)
 
     return np.array(teams).flatten()
 
@@ -120,6 +127,7 @@ async def main(
 ):
     pool = generate_pool(pool_size, export=True)
     # new_pool = import_pool(filename="pool.txt")
+    pool = import_pool(team_string=gen_1_pokemon())  # DOES NOT WORK
     print(f"pool: {pool}")
     print(f"pool shape: {pool.shape}")
     # print(f"new pool: {new_pool}")
