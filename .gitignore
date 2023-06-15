@@ -165,3 +165,7 @@ venv-pokemon/
 
 # showdown
 pokemon-showdown/
+
+# Outputs 
+outputs/*
+
