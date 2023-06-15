@@ -1,6 +1,7 @@
 """
 """
 from __future__ import annotations
+import asyncio
 
 from itertools import combinations
 
@@ -30,6 +31,8 @@ class PokeEnv:
             res1, res2 = await self.battle(teams[t1], teams[t2])
             teams[t1].set_fitness(res1)
             teams[t2].set_fitness(res2)
+
+                
 
     async def battle(self, team1, team2):
         self.p1.update_team(team1.to_packed_str())

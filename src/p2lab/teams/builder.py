@@ -33,7 +33,6 @@ class Builder(Teambuilder):
         else:
             self.teams = []
             print("Generating seed teams")
-    
             with multiprocessing.Pool(processes=8) as pool:
                 teams = list(tqdm(pool.imap(self.generate_teams_via_showdown, [self.team_size for _ in range(N_seed_teams)]), total=N_seed_teams))
             self.teams = [t for t in teams if t is not None]

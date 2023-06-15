@@ -12,13 +12,14 @@ from .stats.team_recorder import TeamRecorder
 from .teams.builder import Builder
 
 N_generations = 50  # Number of generations to run
-N_teams = 100  # Number of teams to generate per generation
+N_teams = 50  # Number of teams to generate per generation
 N_battles = 3  # Number of battles to run per team
+T_size = 6  # Number of pokemon per team
 RECORD = True
 
 
 async def main_loop():
-    builder = Builder(N_seed_teams=N_teams, team_selection_format="gen3randombattle", team_size=3)
+    builder = Builder(N_seed_teams=N_teams, team_selection_format="gen3randombattle", team_size=T_size)
     builder.build_N_teams_from_poke_pool(N_teams)
     curr_gen = 0  # Current generation
     evaluator = PokeEnv(n_battles=N_battles)
