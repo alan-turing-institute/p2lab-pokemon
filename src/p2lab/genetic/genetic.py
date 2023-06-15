@@ -85,6 +85,7 @@ def genetic_team(
     # Compute fitness
     if fitness_kwargs is None:
         fitness_kwargs = {}
+
     fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
     # Genetic Loop
