@@ -7,7 +7,7 @@ from subprocess import check_output
 
 import numpy as np
 from poke_env import PlayerConfiguration
-from poke_env.player import RandomPlayer
+from poke_env.player import SimpleHeuristicsPlayer
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
@@ -128,10 +128,10 @@ async def main(
     matches = dense(teams)
     print(f"matches: {matches}")
     print(f"matches shape: {matches.shape}")
-    player_1 = RandomPlayer(
+    player_1 = SimpleHeuristicsPlayer(
         PlayerConfiguration("Player 1", None), battle_format=battle_format
     )
-    player_2 = RandomPlayer(
+    player_2 = SimpleHeuristicsPlayer(
         PlayerConfiguration("Player 2", None), battle_format=battle_format
     )
     results = await run_battles(
