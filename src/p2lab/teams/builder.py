@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 import sys
 from subprocess import check_output
+import multiprocessing
 
 import numpy as np
 from poke_env.teambuilder import Teambuilder
@@ -19,7 +20,12 @@ class Builder(Teambuilder):
     The team builder
     """
 
-    def __init__(self, N_seed_teams=2, teams=None, format="gen7anythinggoes"):
+    def __init__(self, N_seed_teams=2, teams=None, play_format="gen7anythinggoes", team_selection_format=None, team_size=3):
+        self.play_format = play_format
+        self.team_selection_format = team_selection_format
+        self.team_size = team_size
+        if team_selection_format is None:
+            team_selection_format = format
         if teams:
             self.teams = [
                 self.join_team(self.parse_showdown_team(team)) for team in teams
@@ -27,35 +33,43 @@ class Builder(Teambuilder):
         else:
             self.teams = []
             print("Generating seed teams")
-            for _ in tqdm(range(N_seed_teams)):
-                poss_team = check_output(
-                    f"pokemon-showdown generate-team {format}", shell=True
-                )
-                try:
-                    check_output(
-                        f"pokemon-showdown validate-team {format} ",
-                        shell=True,
-                        input=poss_team,
-                    )
-                except Exception as e:
-                    print("Error validating team... skipping to next")
-                    continue
-                n_team = self.parse_showdown_team(
-                    check_output(
-                        "pokemon-showdown export-team ", input=poss_team, shell=True
-                    ).decode(sys.stdout.encoding)
-                )
-                if len(n_team) != 6:
-                    msg = "Team not of length 6"
-                    raise Exception(msg)
-                self.teams.append(n_team)
+    
+            with multiprocessing.Pool(processes=8) as pool:
+                teams = list(tqdm(pool.imap(self.generate_teams_via_showdown, [self.team_size for _ in range(N_seed_teams)]), total=N_seed_teams))
+            self.teams = [t for t in teams if t is not None]
         self.poke_pool = np.array(self.teams).flatten()
 
     def build_N_teams_from_poke_pool(self, N_teams):
         self.teams = [
-            Team(np.random.choice(self.poke_pool, size=6, replace=False))
+            Team(np.random.choice(self.poke_pool, size=self.team_size, replace=False))
             for _ in range(N_teams)
         ]
+
+
+    def generate_teams_via_showdown(self, _):
+
+        try:
+            poss_team = check_output(
+                f"pokemon-showdown generate-team {self.team_selection_format}", shell=True
+            )
+            check_output(
+                f"pokemon-showdown validate-team {self.play_format} ",
+                shell=True,
+                input=poss_team,
+            )
+
+            n_team = self.parse_showdown_team(
+                check_output(
+                    "pokemon-showdown export-team ", input=poss_team, shell=True
+                ).decode(sys.stdout.encoding)
+            )
+            if len(n_team) != 6:
+                msg = "Team not of length 6"
+                raise Exception(msg)
+        except Exception as e:
+            print("Error validating team... skipping to next")
+            return None
+        return n_team
 
     def get_teams(self):
         return self.teams
@@ -71,7 +85,7 @@ class Builder(Teambuilder):
 
     def breed_teams(self):
         teams = []
-        for _i in range(len(self.teams)):
+        for _ in range(len(self.teams)):
             probs = np.array([t.get_fitness() for t in self.teams])
             probs = probs / np.sum(probs)
             t1, t2 = np.random.choice(self.teams, 2, p=probs, replace=False)
@@ -79,26 +93,17 @@ class Builder(Teambuilder):
             t2 = t2.get_teamlist()
             teams.append(self.breed_team(t1, t2))
         self.teams = teams
-        self.duplicate_detect()  # Prob should take out or move this somewhere else
+
 
     def breed_team(self, t1, t2):
         # REALLY BAD DUPLICATION PREVENTION
         # TODO: FIX ASAP
         poss_pokes = np.concatenate((t1, t2))
         names = [str(p).split("|")[0] for p in poss_pokes]
-        new_team_names = np.random.choice(list(set(names)), size=6, replace=False)
+        new_team_names = np.random.choice(list(set(names)), size=self.team_size, replace=False)
         n2p = dict(zip(names, poss_pokes))
         new_team = [n2p[n] for n in new_team_names]
         return Team(new_team)
-
-    def duplicate_detect(self):
-        for t in self.teams:
-            pokes = []
-            for p in t.get_teamlist():
-                pokes.append(str(p).split("|")[0])
-            if len(set(pokes)) != 6:
-                print("WARNING DUPLICATION DETECTED")
-                print(pokes)
 
     def mutate_team(self, team, mutation_rate=0.1):
         # Each pokemon in a team has a given probability of being replaced by a random pokemon from the pool

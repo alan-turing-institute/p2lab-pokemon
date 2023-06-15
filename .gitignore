@@ -165,3 +165,4 @@ venv-pokemon/
 
 # Outputs 
 outputs/*
+*.png
