@@ -19,7 +19,8 @@ def build_crossover_fn(
 
     Arguments:
         crossover_method: Function that defines the method of crossover
-                          used. See below
+                          used. If None, the crossover function will simply
+                          be a selection function. See below for various methods
         **kwargs: Arguments passed to the crossover method
     """
 
@@ -61,21 +62,24 @@ def build_crossover_fn(
             # Extract list of pokemon to crossover
             team1_pokemon = team1_old.pokemon
             team2_pokemon = team2_old.pokemon
+            
+            # If a crossover method has been specified
+            if not crossover_method is None:
 
-            # Crossover occurs with parameterised probability
-            crossover = np.random.choice(
-                a=[True, False], p=[crossover_prob, 1 - crossover_prob]
-            )
-
-            # Perform crossover
-            if crossover:
-                team1_pokemon, team2_pokemon = crossover_method(
-                    team1=team1_pokemon,
-                    team2=team2_pokemon,
-                    num_pokemon=num_pokemon,
-                    allow_all=allow_all,
-                    **kwargs,
+                # Crossover occurs with parameterised probability
+                crossover = np.random.choice(
+                    a=[True, False], p=[crossover_prob, 1 - crossover_prob]
                 )
+
+                # Perform crossover
+                if crossover:
+                    team1_pokemon, team2_pokemon = crossover_method(
+                        team1=team1_pokemon,
+                        team2=team2_pokemon,
+                        num_pokemon=num_pokemon,
+                        allow_all=allow_all,
+                        **kwargs,
+                    )
 
             # Build new teams
             team1_new = Team(pokemon=team1_pokemon)
