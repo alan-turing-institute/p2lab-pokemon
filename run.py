@@ -10,6 +10,11 @@ from tqdm import tqdm
 from p2lab.team import Team
 
 
+class Builder(Teambuilder):
+    def yield_team(self):
+        pass
+
+
 def generate_pool(num_pokemon, format="gen7anythinggoes"):
     teams = []
     print("Generating pokemon in batches of 6 to form pool...")
@@ -28,7 +33,7 @@ def generate_pool(num_pokemon, format="gen7anythinggoes"):
             print("Error validating team... skipping to next")
             print(f"Error: {e}")
             continue
-        n_team = Teambuilder().parse_showdown_team(
+        n_team = Builder().parse_showdown_team(
             check_output(
                 "pokemon-showdown export-team ", input=poss_team, shell=True
             ).decode(sys.stdout.encoding)
