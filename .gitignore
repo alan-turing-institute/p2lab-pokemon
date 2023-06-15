@@ -163,5 +163,9 @@ Thumbs.db
 # venv
 venv-pokemon/
 
+# showdown
+pokemon-showdown/
+
 # Outputs 
 outputs/*
+
