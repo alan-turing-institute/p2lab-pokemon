@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+from pathlib import Path
 from subprocess import check_output
 
 import numpy as np
@@ -19,7 +20,9 @@ class Builder(Teambuilder):
         pass
 
 
-def generate_pool(num_pokemon, format="gen7anythinggoes"):
+def generate_pool(
+    num_pokemon, format="gen7anythinggoes", export=False, filename="pool.txt"
+):
     teams = []
     print("Generating pokemon in batches of 6 to form pool...")
     # teams are produced in batches of 6, so we need to generate
@@ -50,7 +53,13 @@ def generate_pool(num_pokemon, format="gen7anythinggoes"):
     pool = np.array(teams).flatten()
 
     # trim the pool to the desired number of pokemon
-    return pool[:num_pokemon]
+    pool = pool[:num_pokemon]
+
+    if export:
+        with Path.open(filename, "w") as f:
+            f.write("\n".join(pool))
+
+    return pool
 
 
 def generate_teams(pool, num_teams, team_size=6):
