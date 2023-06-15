@@ -2,49 +2,91 @@ from __future__ import annotations
 
 import numpy as np
 
-from p2lab.pokemon.team import Team
+from p2lab.teams.team import Team
 
 
 def BTmodel(
     teams: list[Team],
     matches: np.ndarray,
-    results: list[int],
+    results: np.ndarray,
+    max_iter: int,
+    tol: float,
 ) -> list[float]:
     """
-    Bradley-Terry Models
+    Bradley-Terry Models are used to estimate latent team 'abilities'
+    in sports contests.
+
+    They do this by assuming that the probability of team 1 beating team 1
+    has the following form:
+
+    Pr(team1>team2) = exp(a_1) / (exp(a_1) + exp(a_2))
+
+    Where a_1 is team 1's latent ability.
+
+    The abilities are estimated via an iterative algorithm.
+
+    Which means we only need access to win/loss data and match data in order
+    to produce estimates
 
     Args:
-        teams: A list of unique team names
+        teams: A list of teams. Used mainly for generating team IDs
         matches: A numpy.ndarray with the following format:
 
-        team 1 | team 2
-        -------+-------
-          A    |   B
-          B    |   C
-          B    |   D
-          A    |   D
-          B    |   A
+            team 1 | team 2
+            -------+-------
+              A    |   B
+              B    |   C
+              B    |   D
+              A    |   D
+              B    |   A
 
-        'team 1' and 'team 2' are columns containing the IDs of the teams
-        that played in the role of team 1 and team 2 respectively
-
-        results: A list of 1s and 0s, where each entry corresponds to a row
-        in matches denoting whether or not team 1 won the match
+                 'team 1' and 'team 2' are columns containing the IDs of the teams
+                 that played in the role of team 1 and team 2 respectively
+        results: An array of shape (num_matches, 2), where each row corresponds to
+                 an element of matches and each column corresponds to a team. The
+                 items in each column counts the number of times that team won that
+                 matchup. 
+        max_iter: Maximum number of iterations for Bradley-Terry model to run
+        tol: Tolerence to check for convergence at the end of each iteration
     """
-
+    
     # Organise teams into X1 and X2 matrices
-    print(teams)
+    N_team = len(teams)
+    N_match = matches.shape[0]
+    team_ids = np.array(range(N_team))
+    X1 = np.zeros(shape=(N_match, N_team), dtype=np.int32)
+    X2 = np.zeros(shape=(N_match, N_team), dtype=np.int32)
+    for index, pair in enumerate(matches):
+        X1[index, pair[0]] = 1
+        X2[index, pair[1]] = 1
+
+    # Prepare win data
+    total_wins = count_team_wins(
+        team_ids=team_ids,
+        matches=matches,
+        results=results,
+    )
+    win_matrix = make_win_matrix(
+        N_team=N_team,
+        matches=matches,
+        results=results,
+    )
 
     # Generate vector of team abilities
-    print(matches)
+    abilities = np.ones(shape=(N_team), dtype=np.float64)
 
-    # Estimate logit model
-    print(results)
+    # Iteratively update abilities as: p_i = W_i / sum_(j!=1) {(w_ij + w_ji)/(p_i + p_j)}
+    for _iter in range(max_iter):
+        old_abilities = abilities
+        abilities = total_wins / np.array(
+            [BT_iter_func(x, team_ids, win_matrix, abilities) for x in team_ids]
+        )
+        abilities = abilities / np.sum(abilities)
 
-    # # Check for convergence
-    # if np.sum(np.abs(old_abilities - abilities)) < tol:
-    #     break
-
+        # Check for convergence
+        if np.sum(np.abs(old_abilities - abilities)) < tol:
+            break
+    
     return abilities
 
 
@@ -94,8 +136,10 @@ def win_percentages(
 
                  'team 1' and 'team 2' are columns containing the IDs of the teams
                  that played in the role of team 1 and team 2 respectively
-        results: An array of 1s and 0s, where each entry corresponds to a row
-                 in matches denoting whether or not team 1 won the match
+        results: An array of shape (num_matches, 2), where each row corresponds to
+                 an element of matches and each column corresponds to a team. The
+                 items in each column counts the number of times that team won that
+                 matchup. 
     """
     team_ids = np.array(range(len(teams)))
     total_wins = count_team_wins(
@@ -103,12 +147,15 @@ def win_percentages(
         matches=matches,
         results=results,
     )
-    total_matches = count_team_matches(
+    matches_per_pairing = np.sum(results[0,])
+    total_pairings = count_team_pairings(
         team_ids=team_ids,
         matches=matches,
     )
+    total_matches = total_pairings * matches_per_pairing
     win_percentages = total_wins / total_matches
-    return win_percentages / np.sum(win_percentages)  # standardise to sum to 1
+    fitness = win_percentages / np.sum(win_percentages)
+    return fitness
 
 
 # Some helper functions for use across different candidate fitness functions:
@@ -122,31 +169,56 @@ def count_team_wins(
 
     Args:
         team_ids:
-        matches (_type_): _description_
-        results:
+        matches: A numpy.ndarray with the following format:
+
+            team 1 | team 2
+            -------+-------
+              A    |   B
+              B    |   C
+              B    |   D
+              A    |   D
+              B    |   A
+
+                 'team 1' and 'team 2' are columns containing the IDs of the teams
+                 that played in the role of team 1 and team 2 respectively
+        results: An array of shape (num_matches, 2), where each row corresponds to
+                 an element of matches and each column corresponds to a team. The
+                 items in each column counts the number of times that team won that
+                 matchup. 
     """
     total_wins = np.array([], dtype=np.int32)
     for id in team_ids:
         total_wins = np.append(
             total_wins,
-            np.sum(results[matches[:, 0] == id])
-            + np.sum(1 - results[matches[:, 1] == id]),
+            np.sum(results[matches == id]),
         )
     return total_wins
 
 
-def count_team_matches(
+def count_team_pairings(
     team_ids: np.ndarray,
     matches: np.ndarray,
 ) -> np.ndarray:
     """
-    Count the number of matches each team has played
+    Count the number of pairings each team is in within the match
+    data (i.e. does not count the actual number of games)
 
     Args:
         team_ids:
-        matches (_type_): _description_
+         matches: A numpy.ndarray with the following format:
+
+            team 1 | team 2
+            -------+-------
+              A    |   B
+              B    |   C
+              B    |   D
+              A    |   D
+              B    |   A
+
+                 'team 1' and 'team 2' are columns containing the IDs of the teams
+                 that played in the role of team 1 and team 2 respectively
     """
-    return np.array([np.sum(matches == x) for x in team_ids])
+    return np.array([np.sum(matches == id) for id in team_ids])
 
 
 def make_win_matrix(
@@ -159,14 +231,26 @@ def make_win_matrix(
     the number of times team i has beaten team j.
 
     Args:
-        matches (_type_): _description_
-        results (_type_): _description_
-    """
+         matches: A numpy.ndarray with the following format:
 
+            team 1 | team 2
+            -------+-------
+              A    |   B
+              B    |   C
+              B    |   D
+              A    |   D
+              B    |   A
+
+                 'team 1' and 'team 2' are columns containing the IDs of the teams
+                 that played in the role of team 1 and team 2 respectively
+        results: An array of shape (num_matches, 2), where each row corresponds to
+                 an element of matches and each column corresponds to a team. The
+                 items in each column counts the number of times that team won that
+                 matchup. 
+    """
+    
     win_matrix = np.zeros(shape=(N_team, N_team), dtype=np.int32)
     for index, match in enumerate(matches):
-        if results[index] == 0:
-            win_matrix[match[1], match[0]] += 1
-        else:
-            win_matrix[match[0], match[1]] += 1
+        win_matrix[match[0], match[1]] = results[index, 0]
+        win_matrix[match[1], match[0]] = results[index, 1]
     return win_matrix
