@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from p2lab.teams.team import Team
+from p2lab.team import Team
 
 
 def BTmodel(
@@ -45,11 +45,11 @@ def BTmodel(
         results: An array of shape (num_matches, 2), where each row corresponds to
                  an element of matches and each column corresponds to a team. The
                  items in each column counts the number of times that team won that
-                 matchup. 
+                 matchup.
         max_iter: Maximum number of iterations for Bradley-Terry model to run
         tol: Tolerence to check for convergence at the end of each iteration
     """
-    
+
     # Organise teams into X1 and X2 matrices
     N_team = len(teams)
     N_match = matches.shape[0]
@@ -86,7 +86,7 @@ def BTmodel(
         # Check for convergence
         if np.sum(np.abs(old_abilities - abilities)) < tol:
             break
-    
+
     return abilities
 
 
@@ -139,7 +139,7 @@ def win_percentages(
         results: An array of shape (num_matches, 2), where each row corresponds to
                  an element of matches and each column corresponds to a team. The
                  items in each column counts the number of times that team won that
-                 matchup. 
+                 matchup.
     """
     team_ids = np.array(range(len(teams)))
     total_wins = count_team_wins(
@@ -154,8 +154,7 @@ def win_percentages(
     )
     total_matches = total_pairings * matches_per_pairing
     win_percentages = total_wins / total_matches
-    fitness = win_percentages / np.sum(win_percentages)
-    return fitness
+    return win_percentages / np.sum(win_percentages)
 
 
 # Some helper functions for use across different candidate fitness functions:
@@ -184,7 +183,7 @@ def count_team_wins(
         results: An array of shape (num_matches, 2), where each row corresponds to
                  an element of matches and each column corresponds to a team. The
                  items in each column counts the number of times that team won that
-                 matchup. 
+                 matchup.
     """
     total_wins = np.array([], dtype=np.int32)
     for id in team_ids:
@@ -246,9 +245,9 @@ def make_win_matrix(
         results: An array of shape (num_matches, 2), where each row corresponds to
                  an element of matches and each column corresponds to a team. The
                  items in each column counts the number of times that team won that
-                 matchup. 
+                 matchup.
     """
-    
+
     win_matrix = np.zeros(shape=(N_team, N_team), dtype=np.int32)
     for index, match in enumerate(matches):
         win_matrix[match[0], match[1]] = results[index, 0]

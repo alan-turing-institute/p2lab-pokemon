@@ -11,6 +11,7 @@ from poke_env.player import RandomPlayer
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
+from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.team import Team
 
@@ -116,7 +117,7 @@ async def run_battles(
         results.append((p1.n_won_battles, p2.n_won_battles))
         p1.reset_battles()
         p2.reset_battles()
-    return results
+    return np.array(results)
 
 
 async def main():
@@ -130,8 +131,10 @@ async def main():
     matches = dense(teams)
     print(f"matches: {matches}")
     print(f"matches shape: {matches.shape}")
-    results = await run_battles(matches, teams)
+    results = await run_battles(matches, teams, battles_per_match=10)
     print(f"results: {results}")
+    fitness = win_percentages(teams, matches, results)
+    print(f"fitness: {fitness}")
 
 
 # test the pool generation
