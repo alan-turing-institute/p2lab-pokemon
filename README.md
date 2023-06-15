@@ -2,6 +2,22 @@
 
 An interface for optimising pokemon teams using genetic algorithms!
 
+## Installation
+
+steps:
+
+- clone the repo
+- install the module in a virtual environment with `pip install -e .`
+- initialise submodules with `git submodule update --init --recursive`
+- cd into `poke-env` and run `pip install -e .`
+- cd back to the root directory and clone the `pokemon-showdown` repo with
+  `git clone https://github.com/smogon/pokemon-showdown`
+- install with `npm install pokemon-showdown` in the `pokemon-showdown`
+  directory
+- start a local server with `node pokemon-showdown start --no-security` in the
+  `pokemon-showdown` directory
+- cd back to the root directory and run `python run.py` to run the demo!
+
 ## Components
 
 ### Pokemon showdown engine:
@@ -11,7 +27,7 @@ An interface for optimising pokemon teams using genetic algorithms!
 - Has instructions on setting up our own server (needed to run battles!)
 - Also features command-line utilities for generating/validating new teams
 
-### Pokemon battle bot by pmargilia:
+### Pokemon battle bot by pmargilia (not used yet)
 
 [pmargilia/showdown](https://github.com/pmariglia/showdown)
 
@@ -33,21 +49,3 @@ An interface for optimising pokemon teams using genetic algorithms!
 
 - Aiming to be a python module to steer a bunch of bots into battling, collect
   the results, then run a genetic algorithm step!
-
-## Running the battles with Poke-env
-
-- [ ] TODO: Complete this documentation to be tidy
-
-From within the pokemon showdown directory, run the following command to start
-
-```bash
-node pokemon-showdown start --no-security
-```
-
-Then in Poke-env run TBD, but to test it works go into the `poke_env/examples`
-folder and run `python simple_battle.py` to see a battle in action!
-
-## Suggestions for faster running
-
-Using a local pokemon showdown server run with `--no-security` for bot vs. bot
-training to be faster.
