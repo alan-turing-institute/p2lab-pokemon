@@ -18,6 +18,14 @@ steps:
   `pokemon-showdown` directory
 - cd back to the root directory and run `python run.py` to run the demo!
 
+or via Docker:
+
+`docker build -t p2:latest .` `docker run -it p2:latest`
+`docker exec -it your_container_id /bin/bash`
+
+then go to the P2 root and run the script. Run docker build with `--no-cache` to
+rebuild with newer versions of the repos.
+
 ## Components
 
 ### Pokemon showdown engine:
