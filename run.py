@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
-from p2lab.genetic.operations import build_crossover_fn, mutate, slot_swap
+from p2lab.genetic.operations import build_crossover_fn, locus_swap, mutate
 from p2lab.team import Team
 
 
@@ -30,7 +30,7 @@ def generate_pool(
     # teams are produced in batches of 6, so we need to generate
     # a multiple of 6 teams that's greater than the number of pokemon
     N_seed_teams = num_pokemon // 6 + 1
-    for _ in tqdm(range(N_seed_teams)):
+    for _ in tqdm(range(N_seed_teams), desc="Generating teams!"):
         poss_team = check_output(f"pokemon-showdown generate-team {format}", shell=True)
         try:
             check_output(
@@ -100,7 +100,7 @@ async def run_battles(
     progress_bar=True,
 ):
     results = []
-    for t1, t2 in tqdm(matches) if progress_bar else matches:
+    for t1, t2 in tqdm(matches, desc="Battling!") if progress_bar else matches:
         player_1.update_team(teams[t1].to_packed_str())
         player_2.update_team(teams[t2].to_packed_str())
         await player_1.battle_against(player_2, n_battles=battles_per_match)
@@ -111,13 +111,14 @@ async def run_battles(
 
 
 async def main(
-    num_generations=10,
+    pool_size=100,
+    num_generations=3,
     num_teams=3,
-    team_size=6,
-    battles_per_match=10,
+    team_size=3,
+    battles_per_match=2,
     battle_format="gen7anythinggoes",
 ):
-    pool = generate_pool(10, export=True)
+    pool = generate_pool(pool_size, export=True)
     # new_pool = import_pool(filename="pool.txt")
     print(f"pool: {pool}")
     print(f"pool shape: {pool.shape}")
@@ -140,7 +141,7 @@ async def main(
     fitness = win_percentages(teams, matches, results)
     print(f"fitness: {fitness}")
 
-    crossover_fn = build_crossover_fn(slot_swap)
+    crossover_fn = build_crossover_fn(locus_swap)
     for _ in range(num_generations):
         # Crossover based on fitness func
         new_teams = crossover_fn(

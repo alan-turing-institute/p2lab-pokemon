@@ -280,8 +280,8 @@ def mutate(
                 k = random.sample(range(n, num_pokemon - n))[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
-            mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
-            print(mutate_indices)
+            mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
+
             new_pokemon = np.random.choice(
                 pokemon_population, size=k, replace=True
             )  # open to parameterising the replace
