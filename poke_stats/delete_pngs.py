@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import os
 import pickle
-import re
 
 # Directory path where the files are located
 directory = "/Users/lfrance/OneDrive - The Alan Turing Institute/002_Projects/Pokemon/poke-images/pokesprite/pokemon-gen8/regular"

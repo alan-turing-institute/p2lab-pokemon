@@ -13,15 +13,11 @@ from __future__ import annotations
 
 import asyncio
 import pickle
-import sys
 from itertools import combinations_with_replacement as cwr
 
 import numpy as np
-
-from run.py import run_battles
-
-sys.path.insert(1, "/Users/edable-heath/Documents/HackWeek/P2-Lab")
-
+from poke_env.player import SimpleHeuristicsPlayer
+from run import *
 
 # Actual code ==========================================================================
 
@@ -32,7 +28,8 @@ def gen_pop() -> list(poke_objects):
     NB: This can be done more explicity here, i.e. implement the rejection sampling
         in this script, but I will simplify away from that for now.
     """
-    return pop_gen.gen_pop
+    pool = import_pool(team_string=gen_1_pokemon())
+    return generate_gen_1_teams(pool)
 
 
 async def duel(poke_1, poke_2, player_1, player_2) -> bool:
@@ -46,12 +43,14 @@ async def duel(poke_1, poke_2, player_1, player_2) -> bool:
     Returns:
         bool: True if pokemon 1 is victorious.
     """
-    return bool(run_battles([[0, 1]], [poke_1, poke_2], player_1, player_2, 1)[0])
+    return await run_battles([[0, 1]], [poke_1, poke_2], player_1, player_2, 1)
 
 
-def duel_to_convergence(
+async def duel_to_convergence(
     poke_1,
     poke_2,
+    p1,
+    p2,
     cutoff: int,
 ) -> tuple(float, float):
     """DUEL TO THE DEATH! (or at least a converged win ratio.....)
@@ -77,7 +76,8 @@ def duel_to_convergence(
     poke_win_2 = 0
     while count < cutoff:
         count += 1
-        if duel(poke_1, poke_2):
+        res = await duel(poke_1, poke_2, p1, p2)
+        if bool(res[0][0]):
             poke_win_1 += 1
         else:
             poke_win_2 += 1
@@ -92,19 +92,27 @@ async def main(**kwargs):
     # Read the poke_dict for results
     with open("poke_base_stats.pkl", "rb") as f:
         poke_dict = pickle.load(f)
-    poke_names = list(poke_dict.keys())
+
+    poke_names = [poke.first_name for poke in pokemons]
 
     # Instantiate results matrix (we know n = 151)
     res_arr = np.zeros((poke_num, poke_num))
-
+    player_1 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 1", None), battle_format="gen7anythinggoes"
+    )
+    player_2 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 2", None), battle_format="gen7anythinggoes"
+    )
     # Duel to convergence to get stats
     for dueling_partners_id in cwr(list(range(len(pokemons))), 2):
         i, j = dueling_partners_id
         # print(f"IN THE RED CORNER: {poke_names[i]}")
         # print(f"IN THE BLUE CORNER: {poke_names[j]}")
-        poke_ratio_1, poke_ratio_2 = duel_to_convergence(
+        poke_ratio_1, poke_ratio_2 = await duel_to_convergence(
             pokemons[i],
             pokemons[j],
+            player_1,
+            player_2,
             kwargs["cutoff"],
         )
         if i == j:
