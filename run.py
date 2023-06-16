@@ -86,7 +86,7 @@ def import_pool(filename=None, team_string=None):
             team = Builder().parse_showdown_team(human_readable)
             teams.append(team)
     elif team_string is not None:
-        teams = Builder().parse_showdown_team(team_string)
+        teams = np.array(Builder().parse_showdown_team(team_string))
 
     return teams
 
@@ -119,10 +119,10 @@ async def run_battles(
 
 async def main(
     pool_size=100,
-    num_generations=3,
-    num_teams=3,
+    num_generations=10,
+    num_teams=10,
     team_size=3,
-    battles_per_match=2,
+    battles_per_match=3,
     battle_format="gen7anythinggoes",
 ):
     # pool = generate_pool(pool_size, export=True)
