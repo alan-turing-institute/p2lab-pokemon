@@ -14,15 +14,23 @@ from __future__ import annotations
 import asyncio
 import pickle
 from itertools import combinations_with_replacement as cwr
+from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
+from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
-from run import *
+from run import generate_gen_1_teams, import_pool, run_battles
+
+from p2lab.gen_data import gen_1_pokemon
+
+if TYPE_CHECKING:
+    from p2lab.team import Team
 
 # Actual code ==========================================================================
 
 
-def gen_pop() -> list(poke_objects):
+def gen_pop() -> list[Team]:
     """Generate the population of 151 pokemon objects ready to fight.
 
     NB: This can be done more explicity here, i.e. implement the rejection sampling
@@ -90,7 +98,7 @@ async def main(**kwargs):
     poke_num = len(pokemons)
 
     # Read the poke_dict for results
-    with open("poke_base_stats.pkl", "rb") as f:
+    with Path.open("poke_base_stats.pkl", "rb") as f:
         poke_dict = pickle.load(f)
 
     conversion_dict = {
@@ -103,8 +111,8 @@ async def main(**kwargs):
     conversion_dict = {v: k for k, v in conversion_dict.items()}
     poke_names = []
     for poke in pokemons:
-        if poke.first_name.lower() in conversion_dict.keys():
-            print('sgewrojoiwjhgnwil')
+        if poke.first_name.lower() in conversion_dict:
+            print("sgewrojoiwjhgnwil")
             poke_names.append(conversion_dict[poke.first_name.lower()])
         else:
             poke_names.append(poke.first_name.lower())
@@ -113,13 +121,10 @@ async def main(**kwargs):
     # print(poke_dict.keys())
     assert set(poke_names) == set(poke_dict.keys())
 
-    # mr-mime
-    # farfetchd
-    # nidoran-m
-    # nidoran-f
-
     # Instantiate results matrix (we know n = 151)
     res_arr = np.zeros((poke_num, poke_num))
+
+    # Instantiate players
     player_1 = SimpleHeuristicsPlayer(
         PlayerConfiguration("Player 1", None), battle_format="gen7anythinggoes"
     )
@@ -148,12 +153,8 @@ async def main(**kwargs):
     for i in range(len(poke_names)):
         poke_dict[poke_names[i]]["average_win_ratio"] = avg_win_ratio[i]
 
-    # print(poke_dict)
-    # print("for Magikarp:")
-    # print(poke_dict["magikarp"])
-
     # Write poke dict to storage
-    with open("poke_fight_results.pkl", "wb") as fp:
+    with Path.open("poke_fight_results.pkl", "wb") as fp:
         pickle.dump(poke_dict, fp)
     return poke_dict
 
