@@ -583,7 +583,6 @@ Adamant Nature
 - Dynamic Punch
 - Knock Off
 - Bullet Punch
-- Stone Edge
 
 Machamp @ Leftovers
 Ability: No Guard
@@ -592,7 +591,6 @@ Adamant Nature
 - Dynamic Punch
 - Knock Off
 - Bullet Punch
-- Stone Edge
 
 Bellsprout @ Black Sludge
 Ability: Chlorophyll
