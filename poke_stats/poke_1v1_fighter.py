@@ -137,6 +137,6 @@ async def main(**kwargs):
 
 if __name__ == "__main__":
     # Pars hardcoded in for now as should be single run.
-    pars = {"cutoff": 100}
+    pars = {"cutoff": 1}
 
     asyncio.get_event_loop().run_until_complete(main(**pars))
