@@ -82,7 +82,6 @@ Caterpie @ Focus Sash
 Ability: Shield Dust
 EVs: 252 Atk / 4 Def / 252 Spe
 Jolly Nature
-- Poison Sting
 - String Shot
 - Bug Bite	
 
@@ -90,7 +89,6 @@ Metapod @ Eviolite
 Ability: Shed Skin
 EVs: 252 HP / 252 Def / 4 SpD
 Impish Nature
-- Poison Sting
 - String Shot
 - Bug Bite	
 
@@ -101,7 +99,6 @@ Timid Nature
 - Quiver Dance
 - Bug Buzz
 - Sleep Powder
-- Hurricane
 
 Weedle @ Focus Sash
 Ability: Shield Dust
