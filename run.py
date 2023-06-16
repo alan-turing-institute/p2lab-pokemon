@@ -125,7 +125,7 @@ async def main(
     num_generations=10,
     num_teams=151,
     team_size=1,
-    battles_per_match=10,
+    battles_per_match=1,
     battle_format="gen7anythinggoes",
 ):
     # pool = generate_pool(pool_size, export=True)
