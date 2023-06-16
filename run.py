@@ -119,10 +119,10 @@ async def run_battles(
 
 async def main(
     pool_size=100,
-    num_generations=10,
-    num_teams=10,
-    team_size=3,
-    battles_per_match=3,
+    num_generations=100,
+    num_teams=3,
+    team_size=6,
+    battles_per_match=10,
     battle_format="gen7anythinggoes",
 ):
     # pool = generate_pool(pool_size, export=True)
