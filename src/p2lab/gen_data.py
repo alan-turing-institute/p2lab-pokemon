@@ -32,7 +32,6 @@ EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature
 - Flare Blitz
 - Dragon Claw
-- Earthquake
 - Thunder Punch
 
 Charmeleon @ Choice Band
@@ -41,7 +40,6 @@ EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature
 - Flare Blitz
 - Dragon Claw
-- Earthquake
 - Thunder Punch
 
 Charizard @ Leftovers
@@ -84,19 +82,17 @@ Caterpie @ Focus Sash
 Ability: Shield Dust
 EVs: 252 Atk / 4 Def / 252 Spe
 Jolly Nature
-- Bug Bite
-- U-turn
+- Poison Sting
 - String Shot
-- Electroweb
+- Bug Bite	
 
 Metapod @ Eviolite
 Ability: Shed Skin
 EVs: 252 HP / 252 Def / 4 SpD
 Impish Nature
-- Bug Bite
-- U-turn
+- Poison Sting
 - String Shot
-- Electroweb
+- Bug Bite	
 
 Butterfree @ Focus Sash
 Ability: Compound Eyes
@@ -111,28 +107,25 @@ Weedle @ Focus Sash
 Ability: Shield Dust
 EVs: 252 Atk / 4 Def / 252 Spe
 Jolly Nature
-- Poison Jab
-- U-turn
+- Poison Sting
 - String Shot
-- Electroweb
+- Bug Bite	
 
 Kakuna @ Eviolite
 Ability: Shed Skin
 EVs: 252 HP / 252 Def / 4 SpD
 Impish Nature
-- Poison Jab
-- U-turn
+- Poison Sting
 - String Shot
-- Electroweb
+- Bug Bite	
 
 Beedrill @ Choice Scarf
 Ability: Sniper
 EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature
-- Poison Jab
-- U-turn
-- Drill Run
-- Knock Off
+- Poison Sting
+- String Shot
+- Bug Bite	
 
 Pidgey @ Focus Sash
 Ability: Tangled Feet
@@ -229,7 +222,6 @@ Ability: Static
 EVs: 252 SpA / 4 SpD / 252 Spe
 Timid Nature
 - Thunderbolt
-- Psychic
 - Focus Blast
 - Volt Switch
 
@@ -256,45 +248,40 @@ Ability: Hustle
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
 - Toxic Spikes
-- Stealth Rock
 - Toxic
-- Roar
+- Double Kick
 
 Nidorina @ Eviolite
 Ability: Hustle
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
 - Toxic Spikes
-- Stealth Rock
 - Toxic
-- Roar
+- Double Kick
 
 Nidoqueen @ Leftovers
 Ability: Sheer Force
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
-- Stealth Rock
 - Earth Power
 - Toxic
-- Roar
+- Double Kick
 
 Nidoran♂ @ Eviolite
 Ability: Hustle
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
 - Toxic Spikes
-- Stealth Rock
 - Toxic
-- Roar
+- Double Kick
 
 Nidorino @ Eviolite
 Ability: Hustle
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
 - Toxic Spikes
-- Stealth Rock
 - Toxic
-- Roar
+- Double Kick
 
 Nidoking @ Leftovers
 Ability: Sheer Force
@@ -302,7 +289,7 @@ EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature
 - Earthquake
 - Poison Jab
-- Stealth Rock
+- Horn Drill
 - Ice Punch
 
 Clefairy @ Eviolite
@@ -426,7 +413,6 @@ Venonat @ Black Sludge
 Ability: Tinted Lens
 EVs: 252 HP / 4 SpA / 252 Spe
 Timid Nature
-- Bug Buzz
 - Sleep Powder
 - Toxic
 - Quiver Dance
@@ -435,7 +421,6 @@ Venomoth @ Black Sludge
 Ability: Tinted Lens
 EVs: 252 HP / 4 SpA / 252 Spe
 Timid Nature
-- Bug Buzz
 - Sleep Powder
 - Quiver Dance
 - Roost
@@ -699,7 +684,7 @@ Jolly Nature
 - Flare Blitz
 - Wild Charge
 - Morning Sun
-- High Jump Kick
+
 
 Slowpoke @ Eviolite
 Ability: Regenerator
@@ -837,7 +822,7 @@ Timid Nature
 - Destiny Bond
 
 Gengar @ Choice Specs
-Ability: Levitate
+Ability: Cursed Body
 EVs: 252 SpA / 4 SpD / 252 Spe
 Timid Nature
 - Shadow Ball
@@ -1158,7 +1143,6 @@ Jolly Nature
 - Flail
 - Tackle
 - Bounce
-- Dragon Dance
 
 Gyarados @ Leftovers
 Ability: Intimidate
