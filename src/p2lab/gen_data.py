@@ -1034,7 +1034,6 @@ Adamant Nature
 - Waterfall
 - Megahorn
 - Drill Run
-- Aqua Jet
 
 Seaking @ Choice Band
 Ability: Swift Swim
