@@ -93,7 +93,30 @@ async def main(**kwargs):
     with open("poke_base_stats.pkl", "rb") as f:
         poke_dict = pickle.load(f)
 
-    poke_names = [poke.first_name for poke in pokemons]
+    conversion_dict = {
+        "mr-mime": "mr. mime",
+        "farfetchd": "farfetch'd",
+        "nidoran-m": "nidoran♂",
+        "nidoran-f": "nidoran♀",
+    }
+    # flip the dict
+    conversion_dict = {v: k for k, v in conversion_dict.items()}
+    poke_names = []
+    for poke in pokemons:
+        if poke.first_name.lower() in conversion_dict.keys():
+            print('sgewrojoiwjhgnwil')
+            poke_names.append(conversion_dict[poke.first_name.lower()])
+        else:
+            poke_names.append(poke.first_name.lower())
+
+    # print(poke_names)
+    # print(poke_dict.keys())
+    assert set(poke_names) == set(poke_dict.keys())
+
+    # mr-mime
+    # farfetchd
+    # nidoran-m
+    # nidoran-f
 
     # Instantiate results matrix (we know n = 151)
     res_arr = np.zeros((poke_num, poke_num))
