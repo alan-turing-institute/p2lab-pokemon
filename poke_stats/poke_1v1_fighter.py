@@ -69,7 +69,7 @@ async def duel_to_convergence(
 
     Returns:
         (poke_wins_1, poke_wins_2) tuple(float, float):
-            poke_wins_i = (no wins of poke_i) / (no of duels)
+            poke_wins_i = (no wins of poke_i) / (no of duels) f
     """
     count = 0
     poke_win_1 = 0
