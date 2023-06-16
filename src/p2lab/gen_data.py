@@ -639,7 +639,6 @@ Impish Nature
 - Earthquake
 - Stone Edge
 - Stealth Rock
-- Thunder Wave
 
 Graveler @ Eviolite
 Ability: Sturdy
