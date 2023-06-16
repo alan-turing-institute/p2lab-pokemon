@@ -104,7 +104,7 @@ async def main(**kwargs):
     poke_names = []
     for poke in pokemons:
         if poke.first_name.lower() in conversion_dict.keys():
-            print('sgewrojoiwjhgnwil')
+            print("sgewrojoiwjhgnwil")
             poke_names.append(conversion_dict[poke.first_name.lower()])
         else:
             poke_names.append(poke.first_name.lower())
