@@ -486,7 +486,6 @@ Jolly Nature
 - Close Combat
 - U-turn
 - Earthquake
-- Stone Edge
 
 Primeape @ Choice Band
 Ability: Defiant
@@ -495,7 +494,6 @@ Jolly Nature
 - Close Combat
 - U-turn
 - Earthquake
-- Stone Edge
 
 Growlithe @ Leftovers
 Ability: Intimidate
