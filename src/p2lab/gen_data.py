@@ -415,14 +415,12 @@ EVs: 252 HP / 4 SpA / 252 Spe
 Timid Nature
 - Sleep Powder
 - Toxic
-- Quiver Dance
 
 Venomoth @ Black Sludge
 Ability: Tinted Lens
 EVs: 252 HP / 4 SpA / 252 Spe
 Timid Nature
 - Sleep Powder
-- Quiver Dance
 - Roost
 
 Diglett @ Focus Sash
@@ -1048,8 +1046,6 @@ EVs: 252 Atk / 4 Def / 252 Spe
 Adamant Nature
 - Waterfall
 - Megahorn
-- Drill Run
-- Aqua Jet
 
 Staryu @ Life Orb
 Ability: Analytic
