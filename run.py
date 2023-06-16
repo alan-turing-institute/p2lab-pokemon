@@ -88,7 +88,7 @@ def import_pool(filename=None, team_string=None):
     elif team_string is not None:
         teams = Builder().parse_showdown_team(team_string)
 
-    return np.array(teams).flatten()
+    return teams
 
 
 def generate_teams(pool, num_teams, team_size=6):
@@ -103,7 +103,7 @@ async def run_battles(
     teams,
     player_1,
     player_2,
-    battles_per_match=1,
+    battles_per_match=10,
     progress_bar=True,
 ):
     results = []
@@ -125,7 +125,7 @@ async def main(
     battles_per_match=2,
     battle_format="gen7anythinggoes",
 ):
-    pool = generate_pool(pool_size, export=True)
+    # pool = generate_pool(pool_size, export=True)
     # new_pool = import_pool(filename="pool.txt")
     pool = import_pool(team_string=gen_1_pokemon())  # DOES NOT WORK
     print(f"pool: {pool}")
@@ -150,7 +150,7 @@ async def main(
     print(f"fitness: {fitness}")
 
     crossover_fn = build_crossover_fn(locus_swap)
-    for _ in range(num_generations):
+    for i in range(num_generations):
         # Crossover based on fitness func
         new_teams = crossover_fn(
             teams=teams,
@@ -175,10 +175,11 @@ async def main(
         matches = dense(teams)
 
         # Run simulations
+        print(f"Running simulations for generation {i}")
         results = await run_battles(
             matches, teams, player_1, player_2, battles_per_match=battles_per_match
         )
-
+        print(f"computing fitness for generation {i}")
         # Compute fitness
         fitness = win_percentages(teams, matches, results)
 
@@ -188,4 +189,5 @@ async def main(
 
 # test the pool generation
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    best_team = asyncio.get_event_loop().run_until_complete(main())
+    print(f"best team: {best_team}")
