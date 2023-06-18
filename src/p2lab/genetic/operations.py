@@ -9,6 +9,36 @@ import numpy as np
 from p2lab.team import Team
 
 
+### Selection Operation
+def selection(
+    teams: list[Team],
+    fitness: np.ndarray,
+    num_teams: int,
+) -> tuple[list[Team], np.ndarray]:
+    """
+    This function performs the selection genetic operation. Its purpose is to
+    pass on good chromosomes/genes to the next population as a function of
+    fitness.
+
+    Args:
+        teams: A list containing all team objects
+        fitness: A numpy array of shape (N_team,) containing team fitness
+                    scores
+        num_teams: The number of teams
+    """
+    
+    # Sample indices with replacement to produce new teams + fitnesses
+    old_indices = list(range(num_teams))
+    new_indices = random.choices(old_indices, k=num_teams)
+    
+    # New teams and fitness
+    new_teams = [teams[i] for i in new_indices]
+    new_fitness = fitness[new_indices]
+    
+    # Return
+    return new_teams, new_fitness
+
+
 ### Crossover Operations
 def build_crossover_fn(
     crossover_method: Callable,
@@ -25,7 +55,6 @@ def build_crossover_fn(
 
     def crossover_fn(
         teams: list[Team],
-        fitness: np.ndarray,
         num_teams: int,
         num_pokemon: int,
         crossover_prob: float,
@@ -52,11 +81,10 @@ def build_crossover_fn(
 
         # Each loop produces 2 new teams, so needs half this number to produce
         # enough teams.
-        for _i in range(math.ceil(num_teams / 2)):
-            # Sample conditional on fitness
-            teams_old = np.random.choice(teams, size=2, replace=False, p=fitness)
-            team1_old = teams_old[0]
-            team2_old = teams_old[1]
+        for i in range(math.ceil(num_teams / 2)):
+            # Loop over two teams at a time
+            team1_old = teams[i*2]
+            team2_old = teams[i*2 + 1]
 
             # Extract list of pokemon to crossover
             team1_pokemon = team1_old.pokemon

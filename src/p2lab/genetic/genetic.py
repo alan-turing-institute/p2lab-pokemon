@@ -6,9 +6,9 @@ from typing import Callable
 import numpy as np
 
 from p2lab.genetic.matching import dense
-from p2lab.genetic.operations import fitness_mutate, mutate
+from p2lab.genetic.operations import selection, fitness_mutate, mutate
 from p2lab.pokemon.battle import run_battles
-from p2lab.pokemon.team import Team
+from p2lab.team import Team
 
 
 # Psuedocode for the genetic algorithm, some placeholder functions below to
@@ -17,6 +17,7 @@ def genetic_team(
     pokemon_population: list[str],  # list of all valid pokemon names
     num_pokemon: int,
     num_teams: int,
+    match_fn: Callable,
     fitness_fn: Callable,
     crossover_fn: Callable = None,
     crossover_prob: float = 0.95,
@@ -44,6 +45,8 @@ def genetic_team(
         pokemon_population: A list of strings containing all valid pokemon names for the population
         num_pokemon: Number of pokmeon in each team
         num_teams: Number of pokemon teams to generate
+        match_fn: A function that generates an array of matches. See p2lab.genetic.matching for
+                  choices
         fitness_fn: A function to define fitness scores after each round
         crossover_fn: A function that defines the crossover step in each round. Set to
                       None if this step should be ignored.
@@ -77,7 +80,7 @@ def genetic_team(
         num_pokemon,
         num_teams,
     )
-    matches = generate_matches(teams)
+    matches = match_fn(teams)
 
     # Run initial simulations
     results = run_battles(matches)
@@ -90,29 +93,45 @@ def genetic_team(
 
     # Genetic Loop
     for _iter in range(num_evolutions):
+        # Step 1: selection
+        # An odd number of teams is an edge case for crossover, as it uses 2 teams
+        # at a time. This adds an extra team to selection if we are using crossover.
+        # the extra team will be removed by the crossover function.
+        extra = num_teams % 2 - mutate_with_fitness
+        
+        # Returns new fitnesses in case we are doing fitness-mutate
+        new_teams, new_fitness = selection(
+            teams=teams,
+            fitness=fitness,
+            num_teams=num_teams + extra,
+        )
+        
+        # Step 2: crossover
+        # Only do this step if not mutating with fitness, as fitness scores become
+        # invalid after crossover if doing so
+        if not mutate_with_fitness:
+            new_teams = crossover_fn(
+                teams=new_teams,
+                num_teams=num_teams,
+                num_pokemon=num_pokemon,
+                crossover_prob=crossover_prob,
+                allow_all=allow_all,
+            )
+        
+        # Step 3: mutate
         # If mutating with fitness, skip the crossover step. Otherwise, crossover +
         # mutate.
         if mutate_with_fitness:
             teams = fitness_mutate(
-                teams=teams,
+                teams=new_teams,
                 num_pokemon=num_pokemon,
-                fitness=fitness,
+                fitness=new_fitness,
                 pokemon_population=pokemon_population,
                 allow_all=allow_all,
                 k=mutate_k,
             )
 
         else:
-            # Crossover based on fitness func
-            new_teams = crossover_fn(
-                teams=teams,
-                fitness=fitness,
-                num_teams=num_teams,
-                num_pokemon=num_pokemon,
-                crossover_prob=crossover_prob,
-                allow_all=allow_all,
-            )
-
             # Mutate the new teams
             teams = mutate(
                 teams=new_teams,
@@ -124,7 +143,7 @@ def genetic_team(
             )
 
         # Generate matches from list of teams
-        matches = generate_matches(teams)
+        matches = match_fn(teams)
 
         # Run simulations
         results = run_battles(matches)
