@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="40%" alt="relaxed logo" src=assets/logo.png><br>
+  <img width="30%" alt="relaxed logo" src=assets/logo.png><br>
   <br>
   <a href="https://github.com/alan-turing-institute/p2lab-pokemon/actions">
     <img alt="GitHub Workflow Status" src="https://github.com/alan-turing-institute/p2lab-pokemon/workflows/CI/badge.svg">
