@@ -4,7 +4,6 @@ __all__ = ("genetic_algorithm",)
 
 from typing import TYPE_CHECKING, Callable
 
-import numpy as np
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
 
@@ -18,8 +17,7 @@ if TYPE_CHECKING:
     from p2lab.pokemon.teams import Team
 
 
-# Psuedocode for the genetic algorithm, some placeholder functions below to
-# be deleted
+# TODO: account for team size of 1
 async def genetic_algorithm(
     pokemon_pool: list[str],  # list of all valid pokemon names
     num_teams: int,
@@ -37,6 +35,7 @@ async def genetic_algorithm(
     num_generations: int = 500,
     fitness_kwargs: dict | None = None,
     progress_bars: bool = True,
+    unique_teams: bool = False,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -91,6 +90,7 @@ async def genetic_algorithm(
         pokemon_pool,
         num_teams,
         team_size,
+        unique=unique_teams,
     )
     matches = match_fn(teams)
 
@@ -100,6 +100,8 @@ async def genetic_algorithm(
     player_2 = SimpleHeuristicsPlayer(
         PlayerConfiguration("Player 2", None), battle_format=battle_format
     )
+
+    print("Generation 0:")
 
     # Run initial simulations
     results = await run_battles(
@@ -117,7 +119,7 @@ async def genetic_algorithm(
     fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
     # Genetic Loop
-    for _iter in range(num_generations):
+    for i in range(num_generations):
         # Step 1: selection
         # An odd number of teams is an edge case for crossover, as it uses 2 teams
         # at a time. This adds an extra team to selection if we are using crossover.
@@ -170,11 +172,20 @@ async def genetic_algorithm(
         # Generate matches from list of teams
         matches = match_fn(teams)
 
+        print(f"Generation {i + 1}:")
+
         # Run simulations
-        results = run_battles(matches)
+        results = await run_battles(
+            matches,
+            teams,
+            player_1,
+            player_2,
+            battles_per_match=battles_per_match,
+            progress_bar=progress_bars,
+        )
 
         # Compute fitness
         fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
-    # Return the best team
-    return teams[np.argmax(fitness)]
+    # return all teams and fitness scores
+    return teams, fitness
