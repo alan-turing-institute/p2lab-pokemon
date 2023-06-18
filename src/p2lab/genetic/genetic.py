@@ -6,7 +6,7 @@ from typing import Callable
 import numpy as np
 
 from p2lab.genetic.matching import dense
-from p2lab.genetic.operations import selection, fitness_mutate, mutate
+from p2lab.genetic.operations import fitness_mutate, mutate, selection
 from p2lab.pokemon.battle import run_battles
 from p2lab.team import Team
 
@@ -98,14 +98,14 @@ def genetic_team(
         # at a time. This adds an extra team to selection if we are using crossover.
         # the extra team will be removed by the crossover function.
         extra = num_teams % 2 - mutate_with_fitness
-        
+
         # Returns new fitnesses in case we are doing fitness-mutate
         new_teams, new_fitness = selection(
             teams=teams,
             fitness=fitness,
             num_teams=num_teams + extra,
         )
-        
+
         # Step 2: crossover
         # Only do this step if not mutating with fitness, as fitness scores become
         # invalid after crossover if doing so
@@ -117,7 +117,7 @@ def genetic_team(
                 crossover_prob=crossover_prob,
                 allow_all=allow_all,
             )
-        
+
         # Step 3: mutate
         # If mutating with fitness, skip the crossover step. Otherwise, crossover +
         # mutate.

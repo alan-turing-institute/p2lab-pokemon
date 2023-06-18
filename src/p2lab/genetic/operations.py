@@ -26,15 +26,15 @@ def selection(
                     scores
         num_teams: The number of teams
     """
-    
+
     # Sample indices with replacement to produce new teams + fitnesses
     old_indices = list(range(num_teams))
     new_indices = random.choices(old_indices, k=num_teams)
-    
+
     # New teams and fitness
     new_teams = [teams[i] for i in new_indices]
     new_fitness = fitness[new_indices]
-    
+
     # Return
     return new_teams, new_fitness
 
@@ -83,8 +83,8 @@ def build_crossover_fn(
         # enough teams.
         for i in range(math.ceil(num_teams / 2)):
             # Loop over two teams at a time
-            team1_old = teams[i*2]
-            team2_old = teams[i*2 + 1]
+            team1_old = teams[i * 2]
+            team2_old = teams[i * 2 + 1]
 
             # Extract list of pokemon to crossover
             team1_pokemon = team1_old.pokemon
