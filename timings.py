@@ -1,12 +1,15 @@
-from p2lab.genetic.fitness import BTmodel, win_percentages
-from p2lab.genetic.operations import build_crossover_fn, locus_swap, slot_swap, mutate
-from p2lab.team import Team
-from p2lab.genetic.matching import dense
+from __future__ import annotations
 
 import random
-from itertools import permutations
-import numpy as np
 import time
+from itertools import permutations
+
+import numpy as np
+
+from p2lab.genetic.fitness import BTmodel, win_percentages
+from p2lab.genetic.matching import dense
+from p2lab.genetic.operations import build_crossover_fn, mutate, slot_swap
+from p2lab.team import Team
 
 # Constants
 N_TEAM = 3
@@ -18,28 +21,26 @@ NUM_ROUND = 1000
 
 # Function to check timings
 def main():
-    
     # Simulate teams
     poke_pop = list(range(POP_SIZE))
     teams = []
     for _iter in range(N_TEAM):
         teams.append(Team(random.choices(poke_pop, k=N_POKEMON)))
-    
+
     # Run for many rounds
     for round in range(NUM_ROUND):
-        
         # Log
         print(f"Round: {round}")
-    
+
         # All vs all matches
         matches = dense(teams)
         n_match = matches.shape[0]
 
         # Simulate Results
-        perms = np.array(list(permutations(range(BATTLES_PER_PAIR+1), 2)))
-        outcomes = perms[np.sum(perms, axis=1) == 3,:]
+        perms = np.array(list(permutations(range(BATTLES_PER_PAIR + 1), 2)))
+        outcomes = perms[np.sum(perms, axis=1) == 3, :]
         num_outcome = outcomes.shape[1]
-        results = outcomes[random.choices(range(num_outcome), k=n_match),:]
+        results = outcomes[random.choices(range(num_outcome), k=n_match), :]
 
         # Logging step 1
         print(f"Number of matches: {n_match}")
@@ -93,7 +94,7 @@ def main():
         )
         t1_mut = time.perf_counter()
         print(f"Ran mutate in {t1_mut - t0_mut:0.4f} seconds")
-    
+
 
 if __name__ == "__main__":
     main()
