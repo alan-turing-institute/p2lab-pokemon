@@ -116,8 +116,9 @@ async def run_battles(
         player_2.reset_battles()
     return np.array(results)
 
+
 def generate_gen_1_teams(pool):
-    return [Team([pkmn]) for pkmn in pool] 
+    return [Team([pkmn]) for pkmn in pool]
 
 
 async def main(
@@ -131,12 +132,13 @@ async def main(
     # pool = generate_pool(pool_size, export=True)
     # new_pool = import_pool(filename="pool.txt")
     pool = import_pool(team_string=gen_1_pokemon())
-    print(f"pool: {pool}")
+    # print(f"pool: {pool}")
     print(f"pool shape: {pool.shape}")
     # print(f"new pool: {new_pool}")
     # print(f"new pool shape: {new_pool.shape}")
     # teams = generate_teams(pool, num_teams=num_teams, team_size=team_size)
     teams = generate_gen_1_teams(pool)
+    print(teams[0].pokemon)
     matches = dense(teams)
     print(f"matches: {matches}")
     print(f"matches shape: {matches.shape}")

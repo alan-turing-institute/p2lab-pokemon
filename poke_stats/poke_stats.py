@@ -552,7 +552,7 @@ if __name__ == "__main__":
             },
         },
         {
-            "name": "Mr. Mime",
+            "name": "Mr-Mime",
             "hp": 40,
             "atk": 45,
             "def": 65,
@@ -2799,7 +2799,7 @@ if __name__ == "__main__":
             },
         },
         {
-            "name": "Farfetch'd",
+            "name": "Farfetchd",
             "hp": 52,
             "atk": 65,
             "def": 55,
@@ -3182,9 +3182,21 @@ if __name__ == "__main__":
 
     poke_stats = {}
 
+    format_to_tier = {
+        "Uber": "S",
+        "OU": "A",
+        "UUBL": "B+",
+        "UU": "B",
+        "NUBL": "C+",
+        "NU": "C",
+        "PU": "D",
+        "NFE": "E",
+        "LC": "F",
+    }
+
     for d in list_of_poke_dicts:
         poke_stats[d["name"].lower()] = {
-            "tier": d["formats"],
+            "tier": format_to_tier[d["formats"][0]],
             "type": d["types"],
             "stats": {
                 "hp": d["hp"],
@@ -3195,18 +3207,9 @@ if __name__ == "__main__":
                 "spe": d["spe"],
             },
         }
-        # print(f'some poke_stats {poke_stats}')
-        # print(poke_stats[d['name'].lower()])
         poke_stats[d["name"].lower()]["base_stat_total"] = sum(
             poke_stats[d["name"].lower()]["stats"].values()
         )
 
-    # poke_choice = input("Which pokemon you wanna know about?")
-
-    # print(type(poke_choice))
-
-    # print(f"stats for {str(poke_choice)}: {poke_stats[str(poke_choice)]}")
-
     with open("poke_base_stats.pkl", "wb") as fp:
         pickle.dump(poke_stats, fp)
-

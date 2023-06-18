@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def gen_1_pokemon():
     return """Bulbasaur @ Leftovers
 Ability: Chlorophyll
@@ -83,14 +86,14 @@ Ability: Shield Dust
 EVs: 252 Atk / 4 Def / 252 Spe
 Jolly Nature
 - String Shot
-- Bug Bite	
+- Bug Bite
 
 Metapod @ Eviolite
 Ability: Shed Skin
 EVs: 252 HP / 252 Def / 4 SpD
 Impish Nature
 - String Shot
-- Bug Bite	
+- Bug Bite
 
 Butterfree @ Focus Sash
 Ability: Compound Eyes
@@ -106,7 +109,7 @@ EVs: 252 Atk / 4 Def / 252 Spe
 Jolly Nature
 - Poison Sting
 - String Shot
-- Bug Bite	
+- Bug Bite
 
 Kakuna @ Eviolite
 Ability: Shed Skin
@@ -114,7 +117,7 @@ EVs: 252 HP / 252 Def / 4 SpD
 Impish Nature
 - Poison Sting
 - String Shot
-- Bug Bite	
+- Bug Bite
 
 Beedrill @ Choice Scarf
 Ability: Sniper
@@ -122,7 +125,7 @@ EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature
 - Poison Sting
 - String Shot
-- Bug Bite	
+- Bug Bite
 
 Pidgey @ Focus Sash
 Ability: Tangled Feet
