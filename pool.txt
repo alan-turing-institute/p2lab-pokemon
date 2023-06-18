@@ -1,8 +1,0 @@
-Bronzong @ Light Clay
-Ability: Levitate
-Level: 84
-EVs: 85 HP / 85 Atk / 85 Def / 85 SpA / 85 SpD / 85 Spe
-- Light Screen
-- Reflect
-- Toxic
-- Iron Head
