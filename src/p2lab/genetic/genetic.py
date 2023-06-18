@@ -1,33 +1,43 @@
 from __future__ import annotations
 
-import random
-from typing import Callable
+__all__ = ("genetic_algorithm",)
+
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
+from poke_env import PlayerConfiguration
+from poke_env.player import SimpleHeuristicsPlayer
 
+from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.genetic.operations import fitness_mutate, mutate, selection
-from p2lab.pokemon.battle import run_battles
-from p2lab.team import Team
+from p2lab.pokemon.battles import run_battles
+from p2lab.pokemon.teams import generate_teams
+
+if TYPE_CHECKING:
+    from p2lab.pokemon.teams import Team
 
 
 # Psuedocode for the genetic algorithm, some placeholder functions below to
 # be deleted
-def genetic_team(
-    pokemon_population: list[str],  # list of all valid pokemon names
-    num_pokemon: int,
+async def genetic_algorithm(
+    pokemon_pool: list[str],  # list of all valid pokemon names
     num_teams: int,
-    match_fn: Callable,
-    fitness_fn: Callable,
-    crossover_fn: Callable = None,
+    fitness_fn: Callable = win_percentages,
+    match_fn: Callable = dense,
+    battles_per_match: int = 3,
+    team_size: int = 6,
+    battle_format: str = "gen7anythinggoes",
+    crossover_fn: Callable | None = None,
     crossover_prob: float = 0.95,
     mutate_prob: float = 0.01,
     mutate_with_fitness: bool = False,
-    mutate_k=None,
-    allow_all=False,
-    num_evolutions: int = 500,
+    mutate_k: int | None = None,
+    allow_all: bool = False,
+    num_generations: int = 500,
     fitness_kwargs: dict | None = None,
-) -> None:
+    progress_bars: bool = True,
+) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
 
@@ -42,8 +52,8 @@ def genetic_team(
     performing a crossover + mutation step if desired.
 
     Args:
-        pokemon_population: A list of strings containing all valid pokemon names for the population
-        num_pokemon: Number of pokmeon in each team
+        pokemon_pool: A list of strings containing all valid pokemon names for the population
+        team_size: Number of pokmeon in each team
         num_teams: Number of pokemon teams to generate
         match_fn: A function that generates an array of matches. See p2lab.genetic.matching for
                   choices
@@ -65,10 +75,12 @@ def genetic_team(
                    determines whether the whole team can be crossed/mutated. Should be set
                    to true when num_pokemon < 3. Redundant if the number of swaps/
                    mutations is is not random.
-        num_evolutions: Number of evolutions to run the model for. The more the better.
+        num_generations: Number of generations to run the model for. The more the better.
     """
     # Some quick checks
-    assert mutate_with_fitness is True or crossover_fn is not None  # you need one!
+    assert (
+        mutate_with_fitness is True or crossover_fn is not None
+    ), "Either crossover_fn must be defined or mutate_with_fitness must be True."
     assert mutate_prob > 0
     assert mutate_prob < 1
     assert crossover_prob > 0
@@ -76,15 +88,28 @@ def genetic_team(
 
     # Generate initial group of teams and matchups
     teams = generate_teams(
-        pokemon_population,
-        num_pokemon,
+        pokemon_pool,
         num_teams,
+        team_size,
     )
     matches = match_fn(teams)
 
-    # Run initial simulations
-    results = run_battles(matches)
+    player_1 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 1", None), battle_format=battle_format
+    )
+    player_2 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 2", None), battle_format=battle_format
+    )
 
+    # Run initial simulations
+    results = await run_battles(
+        matches,
+        teams,
+        player_1,
+        player_2,
+        battles_per_match=battles_per_match,
+        progress_bar=progress_bars,
+    )
     # Compute fitness
     if fitness_kwargs is None:
         fitness_kwargs = {}
@@ -92,7 +117,7 @@ def genetic_team(
     fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
     # Genetic Loop
-    for _iter in range(num_evolutions):
+    for _iter in range(num_generations):
         # Step 1: selection
         # An odd number of teams is an edge case for crossover, as it uses 2 teams
         # at a time. This adds an extra team to selection if we are using crossover.
@@ -113,7 +138,7 @@ def genetic_team(
             new_teams = crossover_fn(
                 teams=new_teams,
                 num_teams=num_teams,
-                num_pokemon=num_pokemon,
+                num_pokemon=team_size,
                 crossover_prob=crossover_prob,
                 allow_all=allow_all,
             )
@@ -124,9 +149,9 @@ def genetic_team(
         if mutate_with_fitness:
             teams = fitness_mutate(
                 teams=new_teams,
-                num_pokemon=num_pokemon,
+                num_pokemon=team_size,
                 fitness=new_fitness,
-                pokemon_population=pokemon_population,
+                pokemon_population=pokemon_pool,
                 allow_all=allow_all,
                 k=mutate_k,
             )
@@ -135,9 +160,9 @@ def genetic_team(
             # Mutate the new teams
             teams = mutate(
                 teams=new_teams,
-                num_pokemon=num_pokemon,
+                num_pokemon=team_size,
                 mutate_prob=mutate_prob,
-                pokemon_population=pokemon_population,
+                pokemon_population=pokemon_pool,
                 allow_all=allow_all,
                 k=mutate_k,
             )
@@ -151,35 +176,5 @@ def genetic_team(
         # Compute fitness
         fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
 
-
-# Consider seeding this?
-def generate_teams(
-    pokemon_population: list[str],
-    num_pokemon: int,
-    num_teams: int,
-) -> list[Team]:
-    # TODO Use pre-made teambuilder
-    teams = []
-    for _i in range(num_teams):
-        pokemon = random.sample(population=pokemon_population, k=num_pokemon)
-        teams.append(Team(pokemon=pokemon))
-    return teams
-
-
-def generate_matches(teams: list[Team]) -> np.ndarray:
-    """
-
-    First column should be team IDs for player 1
-    Second column should be team IDs for player 2
-
-    Team IDs can be generated fresh each round, but we'll need to
-    track them each round
-
-    Actually, team IDs can just index the current team list?
-
-        Outputs:
-
-                np.ndarray shape (N_matches, 2) The columns are team ids.
-
-    """
-    return dense(teams)
+    # Return the best team
+    return teams[np.argmax(fitness)]

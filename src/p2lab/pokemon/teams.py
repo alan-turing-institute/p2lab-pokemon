@@ -1,0 +1,116 @@
+from __future__ import annotations
+
+__all__ = (
+    "Team",
+    "generate_pool",
+    "generate_teams",
+    "import_pool",
+)
+
+import sys
+from pathlib import Path
+from subprocess import check_output
+
+import numpy as np
+from poke_env.teambuilder import Teambuilder
+from tqdm import tqdm
+
+
+class Team:
+    def __init__(self, pokemon) -> None:
+        self.pokemon = np.array(pokemon)
+        self.first_name = self.pokemon[0].formatted.split("|")[0]
+
+    def to_packed_str(self) -> str:
+        return "]".join([mon.formatted for mon in self.pokemon])
+
+
+class _Builder(Teambuilder):
+    def yield_team(self):
+        pass
+
+
+def generate_pool(
+    num_pokemon, format="gen7anythinggoes", export=False, filename="pool.txt"
+):
+    teams = []
+    print("Generating pokemon in batches of 6 to form pool...")
+    # teams are produced in batches of 6, so we need to generate
+    # a multiple of 6 teams that's greater than the number of pokemon
+    N_seed_teams = num_pokemon // 6 + 1
+    for _ in tqdm(range(N_seed_teams), desc="Generating teams!"):
+        poss_team = check_output(f"pokemon-showdown generate-team {format}", shell=True)
+        try:
+            check_output(
+                f"pokemon-showdown validate-team {format} ",
+                shell=True,
+                input=poss_team,
+            )
+        except Exception as e:
+            print("Error validating team... skipping to next")
+            print(f"Error: {e}")
+            continue
+        n_team = _Builder().parse_showdown_team(
+            check_output(
+                "pokemon-showdown export-team ", input=poss_team, shell=True
+            ).decode(sys.stdout.encoding)
+        )
+        if len(n_team) != 6:
+            msg = "pokemon showdown generated a team not of length 6"
+            raise Exception(msg)
+        teams.append(n_team)
+
+    pool = np.array(teams).flatten()
+
+    # trim the pool to the desired number of pokemon
+    pool = pool[:num_pokemon]
+
+    if export:
+        with Path.open(filename, "w") as f:
+            packed = "\n".join([mon.formatted for mon in pool])
+            # convert using pokemon-showdown export-team
+            human_readable = check_output(
+                "pokemon-showdown export-team ",
+                input=packed,
+                shell=True,
+                universal_newlines=True,
+            )
+            f.write(human_readable)
+
+    return pool
+
+
+def import_pool(pool_source):
+    # check if pool is a filename or a list of teams by matching the file extension
+    if isinstance(pool_source, str):
+        if Path(pool_source).suffix == ".txt":
+            with Path.open(pool_source, "r") as f:
+                human_readable = f.read()
+            teams = []
+            # loop over every 6 lines and parse the team
+            for _i in range(0, len(human_readable.splitlines()), 6):
+                team = _Builder().parse_showdown_team(human_readable)
+                teams.append(team)
+            pool = np.array(teams).flatten()
+        else:
+            pool = np.array(_Builder().parse_showdown_team(pool_source))
+    else:
+        msg = "pool_source must be a filename or a list of teams"
+        raise Exception(msg)
+    return pool
+
+
+def generate_teams(pool, num_teams, team_size=6, unique=False):
+    if unique:
+        if num_teams * team_size > len(pool):
+            msg = f"Cannot generate {num_teams} teams of size {team_size} from pool of size {len(pool)}"
+            raise Exception(msg)
+        indicies = np.random.choice(
+            len(pool), size=num_teams * team_size, replace=False
+        )
+        teams = np.array(pool)[indicies].reshape(num_teams, team_size)
+        return [Team(team) for team in teams]
+    return [
+        Team(np.random.choice(pool, size=team_size, replace=False))
+        for _ in range(num_teams)
+    ]

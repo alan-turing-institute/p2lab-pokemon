@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 
-from p2lab.team import Team
+if TYPE_CHECKING:
+    from p2lab.pokemon.teams import Team
 
 
 def BTmodel(

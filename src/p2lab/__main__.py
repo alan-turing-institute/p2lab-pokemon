@@ -1,37 +1,28 @@
-"""
-TODO: Write some docs here.
-"""
 from __future__ import annotations
 
 import asyncio
 
-from tqdm import tqdm
-
-from .evaluator.poke_env import PokeEnv
-from .stats.team_recorder import TeamRecorder
-from .teams.builder import Builder
-
-N_generations = 50  # Number of generations to run
-N_teams = 2  # Number of teams to generate per generation
-N_battles = 3  # Number of battles to run per team
-RECORD = True
+from p2lab.genetic.genetic import genetic_algorithm
+from p2lab.genetic.operations import locus_swap
+from p2lab.pokemon.premade import gen_1_pokemon
+from p2lab.pokemon.teams import import_pool
 
 
-async def main_loop():
-    builder = Builder(N_seed_teams=N_teams)
-    builder.build_N_teams_from_poke_pool(N_teams)
-    curr_gen = 0  # Current generation
-    evaluator = PokeEnv(n_battles=N_battles)
-    recorder = TeamRecorder()
+async def main_loop(num_teams: int = 10, team_size: int = 6, num_generations: int = 10):
+    # generate the pool
+    pool = import_pool(gen_1_pokemon())
+    # run the genetic algorithm
+    best_team = await genetic_algorithm(
+        pokemon_pool=pool,
+        num_teams=num_teams,
+        team_size=team_size,
+        num_generations=num_generations,
+        progress_bars=True,
+        crossover_fn=locus_swap,
+    )
 
-    # Main expected loop
-    print("Starting main loop and running on Generation: ")
-    for _ in tqdm(range(N_generations)):
-        if RECORD:
-            recorder.record_teams(builder.get_teams(), curr_gen)
-        await evaluator.evaluate_teams(builder.get_teams())
-        builder.generate_new_teams()
-        curr_gen += 1
+    # print the best team
+    print(best_team)
 
 
 def main():

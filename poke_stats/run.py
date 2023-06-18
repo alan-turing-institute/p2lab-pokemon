@@ -117,8 +117,8 @@ async def run_battles(
     return np.array(results)
 
 
-def generate_gen_1_teams(pool):
-    return [Team([pkmn]) for pkmn in pool]
+def generate_gen_1_teams():
+    return [Team([pkmn]) for pkmn in import_pool(team_string=gen_1_pokemon())]
 
 
 async def main(

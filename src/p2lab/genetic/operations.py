@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 
-from p2lab.team import Team
+if TYPE_CHECKING:
+    from p2lab.pokemon.teams import Team
 
 
 ### Selection Operation
