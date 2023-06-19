@@ -55,10 +55,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/alan-turing-institute/P2-Lab"
-"Bug Tracker" = "https://github.com/alan-turing-institute/P2-Lab/issues"
-Discussions = "https://github.com/alan-turing-institute/P2-Lab/discussions"
-Changelog = "https://github.com/alan-turing-institute/P2-Lab/releases"
+Homepage = "https://github.com/alan-turing-institute/p2lab-pokemon"
+"Bug Tracker" = "https://github.com/alan-turing-institute/p2lab-pokemon/issues"
+Discussions = "https://github.com/alan-turing-institute/p2lab-pokemon/discussions"
+Changelog = "https://github.com/alan-turing-institute/p2lab-pokemon/releases"
 [tool.hatch]
 version.path = "src/p2lab/__init__.py"
 envs.default.dependencies = [
