@@ -39,7 +39,7 @@ async def test_main_loop(team_size, crossover_fn):
         num_teams=num_teams,
         team_size=team_size,
         num_generations=3,
-        progress_bars=False,
+        progress_bars=True,
         crossover_fn=crossover_fn,
         mutate_with_fitness=crossover_fn is None,
         mutate_k=1,
