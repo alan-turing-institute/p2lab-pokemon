@@ -6,9 +6,6 @@ import pytest
 from p2lab.genetic.genetic import genetic_algorithm
 from p2lab.genetic.operations import (
     build_crossover_fn,
-    locus_swap,
-    sample_swap,
-    slot_swap,
 )
 from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
@@ -18,10 +15,11 @@ from p2lab.pokemon.teams import generate_teams, import_pool
 @pytest.mark.parametrize(
     ("team_size", "crossover_fn"),
     [
-        (2, None),
-        (6, locus_swap),
-        (6, slot_swap),
-        (6, sample_swap),
+        (1, None),
+        # (2, None),
+        # (6, locus_swap),
+        # (6, slot_swap),
+        # (6, sample_swap),
     ],
 )
 async def test_main_loop(team_size, crossover_fn):

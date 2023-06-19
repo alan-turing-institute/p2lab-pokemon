@@ -115,54 +115,56 @@ async def genetic_algorithm(
 
     # Genetic Loop
     for i in range(num_generations):
-        # Step 1: selection
-        # An odd number of teams is an edge case for crossover, as it uses 2 teams
-        # at a time. This adds an extra team to selection if we are using crossover.
-        # the extra team will be removed by the crossover function.
-        extra = num_teams % 2 - mutate_with_fitness
+        # account for team size of 1
+        if team_size != 1:
+            # Step 1: selection
+            # An odd number of teams is an edge case for crossover, as it uses 2 teams
+            # at a time. This adds an extra team to selection if we are using crossover.
+            # the extra team will be removed by the crossover function.
+            extra = num_teams % 2 - mutate_with_fitness
 
-        # Returns new fitnesses in case we are doing fitness-mutate
-        new_teams, new_fitness = selection(
-            teams=teams,
-            fitness=fitness,
-            num_teams=num_teams + extra,
-        )
-
-        # Step 2: crossover
-        # Only do this step if not mutating with fitness, as fitness scores become
-        # invalid after crossover if doing so
-        if not mutate_with_fitness:
-            new_teams = crossover_fn(
-                teams=new_teams,
-                num_teams=num_teams,
-                num_pokemon=team_size,
-                crossover_prob=crossover_prob,
-                allow_all=allow_all,
+            # Returns new fitnesses in case we are doing fitness-mutate
+            new_teams, new_fitness = selection(
+                teams=teams,
+                fitness=fitness,
+                num_teams=num_teams + extra,
             )
 
-        # Step 3: mutate
-        # If mutating with fitness, skip the crossover step. Otherwise, crossover +
-        # mutate.
-        if mutate_with_fitness:
-            teams = fitness_mutate(
-                teams=new_teams,
-                num_pokemon=team_size,
-                fitness=new_fitness,
-                pokemon_population=pokemon_pool,
-                allow_all=allow_all,
-                k=mutate_k,
-            )
+            # Step 2: crossover
+            # Only do this step if not mutating with fitness, as fitness scores become
+            # invalid after crossover if doing so
+            if not mutate_with_fitness:
+                new_teams = crossover_fn(
+                    teams=new_teams,
+                    num_teams=num_teams,
+                    num_pokemon=team_size,
+                    crossover_prob=crossover_prob,
+                    allow_all=allow_all,
+                )
 
-        else:
-            # Mutate the new teams
-            teams = mutate(
-                teams=new_teams,
-                num_pokemon=team_size,
-                mutate_prob=mutate_prob,
-                pokemon_population=pokemon_pool,
-                allow_all=allow_all,
-                k=mutate_k,
-            )
+            # Step 3: mutate
+            # If mutating with fitness, skip the crossover step. Otherwise, crossover +
+            # mutate.
+            if mutate_with_fitness:
+                teams = fitness_mutate(
+                    teams=new_teams,
+                    num_pokemon=team_size,
+                    fitness=new_fitness,
+                    pokemon_population=pokemon_pool,
+                    allow_all=allow_all,
+                    k=mutate_k,
+                )
+
+            else:
+                # Mutate the new teams
+                teams = mutate(
+                    teams=new_teams,
+                    num_pokemon=team_size,
+                    mutate_prob=mutate_prob,
+                    pokemon_population=pokemon_pool,
+                    allow_all=allow_all,
+                    k=mutate_k,
+                )
 
         # Generate matches from list of teams
         matches = match_fn(teams)
