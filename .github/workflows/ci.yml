@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.11"]
         runs-on: [ubuntu-latest, macos-latest]
 
     steps:
@@ -52,6 +52,9 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install poke-env
+        run: cd poke-env && python -m pip install . && cd ..
 
       ## copied from poke-env's CI (thank you!) ##
       - name: Setup node
