@@ -47,10 +47,22 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: recursive
 
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install nodejs/npm
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install pokemon showdown
+        run: npm install -g pokemon-showdown
+
+      - name: Set up server
+        run: pokemon-showdown start --no-security
 
       - name: Install package
         run: python -m pip install .[test]
