@@ -8,7 +8,7 @@ name = "p2lab"
 authors = [
   { name = "Scientists of the P2 Laboratory", email = "nsimpson@turing.ac.uk" },
 ]
-description = "a secret package for genetic optimisation of pokemon teams"
+description = "a package for genetic optimisation of pokemon teams"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -37,14 +37,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-
 test = [
   "pytest >=6",
   "pytest-cov >=3",
-]
-dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
+  "pytest-asyncio",
 ]
 docs = [
   "sphinx>=4.0",
@@ -64,6 +60,7 @@ version.path = "src/p2lab/__init__.py"
 envs.default.dependencies = [
   "pytest",
   "pytest-cov",
+  "pytest-asyncio",
 ]
 
 
