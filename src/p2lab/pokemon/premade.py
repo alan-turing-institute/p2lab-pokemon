@@ -1,5 +1,11 @@
 from __future__ import annotations
 
+from p2lab.pokemon.teams import Team, import_pool
+
+
+def generate_gen_1_teams():
+    return [Team([pkmn]) for pkmn in import_pool(team_string=gen_1_pokemon())]
+
 
 def gen_1_pokemon():
     return """Bulbasaur @ Leftovers

@@ -1,41 +1,57 @@
-"""
-TODO: Write some docs here.
-"""
 from __future__ import annotations
 
 import asyncio
 
-from tqdm import tqdm
+import numpy as np
 
-from .evaluator.poke_env import PokeEnv
-from .stats.team_recorder import TeamRecorder
-from .teams.builder import Builder
-
-N_generations = 50  # Number of generations to run
-N_teams = 2  # Number of teams to generate per generation
-N_battles = 3  # Number of battles to run per team
-RECORD = True
+from p2lab.genetic.genetic import genetic_algorithm
+from p2lab.pokemon.premade import gen_1_pokemon
+from p2lab.pokemon.teams import generate_teams, import_pool
 
 
-async def main_loop():
-    builder = Builder(N_seed_teams=N_teams)
-    builder.build_N_teams_from_poke_pool(N_teams)
-    curr_gen = 0  # Current generation
-    evaluator = PokeEnv(n_battles=N_battles)
-    recorder = TeamRecorder()
+async def main_loop(num_teams, team_size, num_generations, unique):
+    # generate the pool
+    pool = import_pool(gen_1_pokemon())
+    seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
+    # crossover_fn = build_crossover_fn(locus_swap, locus=0)
+    # run the genetic algorithm
+    teams, fitnesses = await genetic_algorithm(
+        pokemon_pool=pool,
+        seed_teams=seed_teams,
+        num_teams=num_teams,
+        team_size=team_size,
+        num_generations=num_generations,
+        progress_bars=True,
+        mutate_with_fitness=True,
+        mutate_k=1,
+    )
 
-    # Main expected loop
-    print("Starting main loop and running on Generation: ")
-    for _ in tqdm(range(N_generations)):
-        if RECORD:
-            recorder.record_teams(builder.get_teams(), curr_gen)
-        await evaluator.evaluate_teams(builder.get_teams())
-        builder.generate_new_teams()
-        curr_gen += 1
+    print("Best team:")
+    best_team = teams[np.argmax(fitnesses)]
+    fitness = fitnesses[np.argmax(fitnesses)]
+    for mon in best_team.pokemon:
+        print(mon.formatted)
+
+    print(f"Fitness: {fitness}")
+
+    print("Worst team:")
+
+    worst_team = teams[np.argmin(fitnesses)]
+    fitness = fitnesses[np.argmin(fitnesses)]
+    for mon in worst_team.pokemon:
+        print(mon.formatted)
+
+    print(f"Fitness: {fitness}")
 
 
 def main():
-    asyncio.get_event_loop().run_until_complete(main_loop())
+    num_teams = 30
+    team_size = 2
+    num_generations = 10
+    unique = True
+    asyncio.get_event_loop().run_until_complete(
+        main_loop(num_teams, team_size, num_generations, unique)
+    )
 
 
 if __name__ == "__main__":

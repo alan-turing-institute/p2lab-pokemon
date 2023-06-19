@@ -58,7 +58,7 @@ def main():
 
         # Timings: BT
         t0_bt = time.perf_counter()
-        fitness_bt = BTmodel(
+        _fitness_bt = BTmodel(
             teams=teams,
             matches=matches,
             results=results,
@@ -71,7 +71,7 @@ def main():
         # Timings: Crossover
         t0_slot = time.perf_counter()
         crossover_fn = build_crossover_fn(slot_swap, k=1)
-        teams_new = crossover_fn(
+        _teams_new = crossover_fn(
             teams=teams,
             fitness=fitness_wp,
             num_teams=N_TEAM,

@@ -6,7 +6,7 @@ from typing import Callable
 
 import numpy as np
 
-from p2lab.team import Team
+from p2lab.pokemon.teams import Team
 
 
 ### Selection Operation
@@ -26,15 +26,15 @@ def selection(
                     scores
         num_teams: The number of teams
     """
-    
+
     # Sample indices with replacement to produce new teams + fitnesses
     old_indices = list(range(num_teams))
     new_indices = random.choices(old_indices, k=num_teams)
-    
+
     # New teams and fitness
     new_teams = [teams[i] for i in new_indices]
     new_fitness = fitness[new_indices]
-    
+
     # Return
     return new_teams, new_fitness
 
@@ -83,8 +83,8 @@ def build_crossover_fn(
         # enough teams.
         for i in range(math.ceil(num_teams / 2)):
             # Loop over two teams at a time
-            team1_old = teams[i*2]
-            team2_old = teams[i*2 + 1]
+            team1_old = teams[i * 2]
+            team2_old = teams[i * 2 + 1]
 
             # Extract list of pokemon to crossover
             team1_pokemon = team1_old.pokemon
@@ -305,7 +305,7 @@ def mutate(
                 # If allow_all is true, the teams may just completely swap members
                 # or not swap at all. This changes the higher level crossover probs!
                 n = 0 if allow_all else 1
-                k = random.sample(range(n, num_pokemon - n))[0]
+                k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
@@ -353,10 +353,10 @@ def fitness_mutate(
                 # If allow_all is true, the teams may just completely swap members
                 # or not swap at all. This changes the higher level crossover probs!
                 n = 0 if allow_all else 1
-                k = random.sample(range(n, num_pokemon - n))[0]
+                k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
-            mutate_indices = np.random.choice(range(num_pokemon), size=3, replace=False)
+            mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
             new_pokemon = np.random.choice(
                 pokemon_population, size=k, replace=True
             )  # open to parameterising the replace

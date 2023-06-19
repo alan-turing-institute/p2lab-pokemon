@@ -1,4 +1,10 @@
-# P2-Lab
+<p align="center">
+  <img width="30%" alt="relaxed logo" src=assets/logo.png><br>
+  <br>
+  <a href="https://github.com/alan-turing-institute/p2lab-pokemon/actions">
+    <img alt="GitHub Workflow Status" src="https://github.com/alan-turing-institute/p2lab-pokemon/workflows/CI/badge.svg">
+  </a>
+</p>
 
 An interface for optimising pokemon teams using genetic algorithms!
 

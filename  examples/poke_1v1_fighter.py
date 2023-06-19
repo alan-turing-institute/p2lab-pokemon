@@ -20,12 +20,13 @@ from typing import TYPE_CHECKING
 import numpy as np
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
-from run import generate_gen_1_teams, import_pool, run_battles
 
-from p2lab.gen_data import gen_1_pokemon
+from p2lab.pokemon.battles import run_battles
+from p2lab.pokemon.premade import gen_1_pokemon
+from p2lab.pokemon.teams import generate_teams, import_pool
 
 if TYPE_CHECKING:
-    from p2lab.team import Team
+    from p2lab.pokemon.teams import Team
 
 # Actual code ==========================================================================
 
@@ -37,7 +38,7 @@ def gen_pop() -> list[Team]:
         in this script, but I will simplify away from that for now.
     """
     pool = import_pool(team_string=gen_1_pokemon())
-    return generate_gen_1_teams(pool)
+    return generate_teams(pool, num_teams=151, team_size=1, unique=True)
 
 
 async def duel(poke_1, poke_2, player_1, player_2) -> bool:
