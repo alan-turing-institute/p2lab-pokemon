@@ -29,7 +29,9 @@ async def test_main_loop(team_size, crossover_fn):
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=True)
-    crossover_fn = build_crossover_fn(crossover_fn)
+    crossover_fn = (
+        build_crossover_fn(crossover_fn) if crossover_fn is not None else None
+    )
     # run the genetic algorithm
     teams, fitnesses = await genetic_algorithm(
         pokemon_pool=pool,
@@ -38,6 +40,7 @@ async def test_main_loop(team_size, crossover_fn):
         team_size=team_size,
         num_generations=3,
         progress_bars=False,
+        crossover_fn=crossover_fn,
         mutate_with_fitness=crossover_fn is None,
         mutate_k=1,
     )
