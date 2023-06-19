@@ -11,7 +11,6 @@ from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.genetic.operations import fitness_mutate, mutate, selection
 from p2lab.pokemon.battles import run_battles
-from p2lab.pokemon.teams import generate_teams
 
 if TYPE_CHECKING:
     from p2lab.pokemon.teams import Team
@@ -20,6 +19,7 @@ if TYPE_CHECKING:
 # TODO: account for team size of 1
 async def genetic_algorithm(
     pokemon_pool: list[str],  # list of all valid pokemon names
+    seed_teams: list[Team],  # list of teams to seed the algorithm with
     num_teams: int,
     fitness_fn: Callable = win_percentages,
     match_fn: Callable = dense,
@@ -35,7 +35,6 @@ async def genetic_algorithm(
     num_generations: int = 500,
     fitness_kwargs: dict | None = None,
     progress_bars: bool = True,
-    unique_teams: bool = False,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -85,14 +84,8 @@ async def genetic_algorithm(
     assert crossover_prob > 0
     assert crossover_prob <= 1
 
-    # Generate initial group of teams and matchups
-    teams = generate_teams(
-        pokemon_pool,
-        num_teams,
-        team_size,
-        unique=unique_teams,
-    )
-    matches = match_fn(teams)
+    # Generate initial group of matchups
+    matches = match_fn(seed_teams)
 
     player_1 = SimpleHeuristicsPlayer(
         PlayerConfiguration("Player 1", None), battle_format=battle_format
@@ -106,7 +99,7 @@ async def genetic_algorithm(
     # Run initial simulations
     results = await run_battles(
         matches,
-        teams,
+        seed_teams,
         player_1,
         player_2,
         battles_per_match=battles_per_match,
@@ -116,7 +109,9 @@ async def genetic_algorithm(
     if fitness_kwargs is None:
         fitness_kwargs = {}
 
-    fitness = fitness_fn(teams, matches, results, **fitness_kwargs)
+    fitness = fitness_fn(seed_teams, matches, results, **fitness_kwargs)
+
+    teams = seed_teams
 
     # Genetic Loop
     for i in range(num_generations):
