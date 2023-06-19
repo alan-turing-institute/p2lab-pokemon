@@ -56,7 +56,7 @@ jobs:
       - name: Install nodejs/npm
         uses: actions/setup-node@v2
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Install pokemon showdown
         run: npm install -g pokemon-showdown
