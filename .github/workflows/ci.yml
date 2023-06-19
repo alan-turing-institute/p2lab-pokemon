@@ -36,12 +36,13 @@ jobs:
   checks:
     name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
     runs-on: ${{ matrix.runs-on }}
+    timeout-minutes: 15
     needs: [pre-commit]
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.11"]
-        runs-on: [ubuntu-latest, macos-latest]
+        runs-on: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v3

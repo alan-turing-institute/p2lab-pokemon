@@ -15,22 +15,25 @@ steps:
 - clone the repo
 - install the module in a virtual environment with `pip install -e .`
 - initialise submodules with `git submodule update --init --recursive`
+  - if you're having problems, you can directly clone poke-env with
+    `git clone https://github.com/aoifehughes/poke-env.git`
 - cd into `poke-env` and run `pip install -e .`
 - cd back to the root directory and clone the `pokemon-showdown` repo with
   `git clone https://github.com/smogon/pokemon-showdown`
-- install with `npm install pokemon-showdown` in the `pokemon-showdown`
-  directory
+- if you don't have node, install it with `brew install node` (mac) or
+  `sudo apt install nodejs` (linux)
+- install with `npm install` in the `pokemon-showdown` directory
 - start a local server with `node pokemon-showdown start --no-security` in the
   `pokemon-showdown` directory
-- cd back to the root directory and run `python run.py` to run the demo!
+- to run a small demo, you should be able to just run `p2lab` from the command
+  line!
 
 or via Docker:
 
 `docker build -t p2:latest .` `docker run -it p2:latest`
 `docker exec -it your_container_id /bin/bash`
 
-then go to the P2 root and run the script. Run docker build with `--no-cache` to
-rebuild with newer versions of the repos.
+Run docker build with `--no-cache` to rebuild with newer versions of the repos.
 
 ## Components
 
