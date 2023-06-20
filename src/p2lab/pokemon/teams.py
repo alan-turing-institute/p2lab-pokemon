@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 __all__ = (
     "Team",
     "generate_pool",
@@ -18,7 +20,7 @@ from tqdm import tqdm
 
 class Team:
     def __init__(self, pokemon) -> None:
-        self.pokemon = np.array(pokemon)
+        self.pokemon = np.array(deepcopy(pokemon))
         self.first_name = self.pokemon[0].formatted.split("|")[0]
 
     def to_packed_str(self) -> str:
@@ -106,7 +108,7 @@ def generate_teams(pool, num_teams, team_size=6, unique=False):
             msg = f"Cannot generate {num_teams} teams of size {team_size} from pool of size {len(pool)}"
             raise Exception(msg)
         indicies = np.random.choice(
-            len(pool), size=num_teams * team_size, replace=False
+            len(pool), size=(num_teams, team_size), replace=False
         )
         teams = np.array(pool)[indicies].reshape(num_teams, team_size)
         return [Team(team) for team in teams]
