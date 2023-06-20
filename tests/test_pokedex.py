@@ -15,7 +15,9 @@ def test_eevee_fetch():
 
 
 def test_eevee_moves():
-    assert 1 == 0
+    p = poke_factory.PokeFactory()
+    eevee = p.get_pokemon_by_dexnum(133)
+    assert eevee is not None
 
 
 def test_eevee_stats():
