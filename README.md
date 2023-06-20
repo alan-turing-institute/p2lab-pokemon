@@ -16,6 +16,7 @@ An interface for optimising Pokémon teams using genetic algorithms!
 git clone git@github.com:alan-turing-institute/p2lab-pokemon.git
 cd p2lab-pokemon
 git submodule update --init --recursive
+git clone git@github.com:smogon/pokemon-showdown.git
 ```
 
 - Install p2lab and poke-env:
