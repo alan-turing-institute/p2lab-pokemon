@@ -12,10 +12,7 @@ from poke_env.data import GenData as POKEDEX
 class PokeFactory:
     def __init__(self, gen=1):
         self.dex = POKEDEX(gen)
-        self.dex2mon = {
-            self.dex.pokedex[m]["num"]: self.dex.pokedex[m]["num"]
-            for m in self.dex.pokedex
-        }
+        self.dex2mon = {int(self.dex.pokedex[m]["num"]): m for m in self.dex.pokedex}
 
     def get_pokemon_by_dexnum(self, dexnum):
         return self.dex.pokedex[self.dex2mon[dexnum]]
