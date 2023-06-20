@@ -16,8 +16,8 @@ def test_eevee_fetch():
 
 def test_bulbasaur_fetch():
     p = poke_factory.PokeFactory()
-    eevee = p.get_pokemon_by_dexnum(1)
-    assert eevee["baseSpecies"].lower() == "bulbasaur"
+    bulb = p.get_pokemon_by_dexnum(1)
+    assert bulb["baseSpecies"].lower() == "bulbasaur"
 
 
 def test_eevee_moves():
@@ -32,5 +32,13 @@ def test_bulbasaur_moves():
     assert len(bulb_moves) > 0
 
 
-def test_eevee_stats():
-    assert 1 == 0
+def test_eevee_is_created():
+    p = poke_factory.PokeFactory()
+    eevee = p.make_pokemon(133)
+    assert eevee is not None
+
+
+def test_eevee_is_created_with_moves():
+    p = poke_factory.PokeFactory()
+    eevee = p.make_pokemon(133, moves=["tackle", "growl"])
+    assert eevee is not None

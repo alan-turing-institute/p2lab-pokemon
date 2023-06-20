@@ -7,6 +7,7 @@ This is directly inspired by poke-env's diagostic_tools folder
 from __future__ import annotations
 
 from poke_env.data import GenData as POKEDEX
+from poke_env.teambuilder import TeambuilderPokemon
 
 
 class PokeFactory:
@@ -42,3 +43,6 @@ class PokeFactory:
             if self.gen in gens:
                 allowed_moves.append(move)
         return allowed_moves
+
+    def make_pokemon(self, dexnum, **kwargs):
+        return TeambuilderPokemon(species=self.dex2mon[dexnum], **kwargs)
