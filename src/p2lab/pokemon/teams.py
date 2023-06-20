@@ -106,7 +106,7 @@ def generate_teams(pool, num_teams, team_size=6, unique=False):
             msg = f"Cannot generate {num_teams} teams of size {team_size} from pool of size {len(pool)}"
             raise Exception(msg)
         indicies = np.random.choice(
-            len(pool), size=num_teams * team_size, replace=False
+            len(pool), size=(num_teams, team_size), replace=False
         )
         teams = np.array(pool)[indicies].reshape(num_teams, team_size)
         return [Team(team) for team in teams]
