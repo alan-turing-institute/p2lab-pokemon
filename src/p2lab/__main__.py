@@ -47,11 +47,27 @@ async def main_loop(num_teams, team_size, num_generations, unique):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", help="Number of generations", type=int, default=10)
-    parser.add_argument("-t", help="Team size", type=int, default=2)
-    parser.add_argument("-n", help="Number of teams", type=int, default=30)
-    parser.add_argument("-s", help="Random seed", type=int, default=None)
-    parser.add_argument("-u", help="Unique teams", default=True)
+    parser.add_argument(
+        "--generations",
+        help="Number of generations to iterate over",
+        type=int,
+        default=10,
+    )
+    parser.add_argument(
+        "--teamsize", help="Number of pokemon per team (max 6)", type=int, default=2
+    )
+    parser.add_argument(
+        "--numteams",
+        help="Number of teams i.e., individuals per generation",
+        type=int,
+        default=30,
+    )
+    parser.add_argument("--seed", help="Random seed to use ", type=int, default=None)
+    parser.add_argument(
+        "--unique",
+        help="Determines if a team can have duplicate pokemon species",
+        default=True,
+    )
     return vars(parser.parse_args())
 
 

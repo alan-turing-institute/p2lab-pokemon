@@ -6,36 +6,68 @@
   </a>
 </p>
 
-An interface for optimising pokemon teams using genetic algorithms!
+An interface for optimising Pokémon teams using genetic algorithms!
 
 ## Installation
 
-steps:
+- Clone required repos:
 
-- clone the repo
-- install the module in a virtual environment with `pip install -e .`
-- initialise submodules with `git submodule update --init --recursive`
-  - if you're having problems, you can directly clone poke-env with
-    `git clone https://github.com/aoifehughes/poke-env.git`
-- cd into `poke-env` and run `pip install -e .`
-- cd back to the root directory and clone the `pokemon-showdown` repo with
-  `git clone https://github.com/smogon/pokemon-showdown`
-- if you don't have node, install it with `brew install node` (mac) or
-  `sudo apt install nodejs` (linux)
-- install with `npm install` in the `pokemon-showdown` directory
-- start a local server with `node pokemon-showdown start --no-security` in the
-  `pokemon-showdown` directory
-- to run a small demo, you should be able to just run `p2lab` from the command
-  line!
+```bash
+git clone git@github.com:alan-turing-institute/p2lab-pokemon.git
+cd p2lab-pokemon
+git submodule update --init --recursive
+```
 
-or via Docker:
+- Install p2lab and poke-env:
 
-`docker build -t p2:latest .` `docker run -it p2:latest`
-`docker exec -it your_container_id /bin/bash`
+```bash
+cd poke-env
+pip install -e .
+cd ..
+pip install -e .
+```
+
+- Have node installed
+  - See: https://nodejs.dev/en/learn/how-to-install-nodejs/
+
+## Running
+
+To run locally start the pokemon showdown server:
+
+```bash
+cd pokemon-showdown
+node pokemon-showdown start --no-security
+```
+
+In another terminal, from this project's root directory run:
+
+```bash
+p2lab <args>
+```
+
+### Additional arguments for p2lab
+
+```bash
+usage: p2lab [-h] [--generations GENERATIONS] [--teamsize TEAMSIZE] [--numteams NUMTEAMS] [--seed SEED] [--unique UNIQUE]
+
+options:
+  -h, --help            show this help message and exit
+  --generations GENERATIONS
+                        Number of generations to iterate over
+  --teamsize TEAMSIZE   Number of pokemon per team (max 6)
+  --numteams NUMTEAMS   Number of teams i.e., individuals per generation
+  --seed SEED           Random seed to use
+  --unique UNIQUE       Determines if a team can have duplicate pokemon species
+```
+
+### Docker:
+
+Alternatively, using docker: `docker build -t p2:latest .`
+`docker run -it p2:latest` `docker exec -it your_container_id /bin/bash`
 
 Run docker build with `--no-cache` to rebuild with newer versions of the repos.
 
-## Components
+## Components used
 
 ### Pokemon showdown engine:
 
@@ -44,25 +76,7 @@ Run docker build with `--no-cache` to rebuild with newer versions of the repos.
 - Has instructions on setting up our own server (needed to run battles!)
 - Also features command-line utilities for generating/validating new teams
 
-### Pokemon battle bot by pmargilia (not used yet)
-
-[pmargilia/showdown](https://github.com/pmariglia/showdown)
-
-- Can interface into a server
-- Can both launch and accept battle challenges --> we can make the bots battle!
-- Already calculates wins/losses in its code (but we need to figure out the best
-  way to get that info)
-- Can be run locally or in a docker container
-
 ### Poke-env
 
 - Wicked fast at simulating battles via pokemon showdown engine
-- A potential replacement for the battle bot by pmargilia
 - https://poke-env.readthedocs.io/en/stable/getting_started.html
-
-### Genetic algorithm library: TBD
-
-### This library, `p2lab`:
-
-- Aiming to be a python module to steer a bunch of bots into battling, collect
-  the results, then run a genetic algorithm step!
