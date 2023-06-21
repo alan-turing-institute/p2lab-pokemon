@@ -12,7 +12,7 @@ pytest_plugins = ("pytest_asyncio",)
 
 
 @pytest.mark.asyncio()
-async def test_battle_random_pokes():
+async def test_battle_eevee_pikachu_pokes():
     p = pokefactory.PokeFactory()
     eevee = p.make_pokemon(133, moves=["tackle", "growl"], level=5)
     pikachu = p.make_pokemon(25, moves=["thundershock", "growl"], level=5)
@@ -29,3 +29,24 @@ async def test_battle_random_pokes():
     )
     res = await run_battles(matches, teams, player_1, player_2, battles_per_match=1)
     assert res is not None
+
+
+@pytest.mark.asyncio()
+async def test_battle_mewtwo_obliterates_eevee():
+    p = pokefactory.PokeFactory()
+    eevee = p.make_pokemon(133, moves=["tackle", "growl"], level=5)
+    mewtwo = p.make_pokemon(151, moves=["psychic"], level=100)
+    team1 = Team([eevee])
+    team2 = Team([mewtwo])
+    teams = [team1, team2]
+    matches = [[0, 1]]
+    player_1 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 3", None), battle_format="gen7anythinggoes"
+    )
+    player_2 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 4", None), battle_format="gen7anythinggoes"
+    )
+    res = await run_battles(matches, teams, player_1, player_2, battles_per_match=10)
+    mewtwo_wins = res[0][1]
+    eevee_wins = res[0][0]
+    assert mewtwo_wins > eevee_wins
