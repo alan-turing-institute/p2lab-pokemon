@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Callable
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
 
+from p2lab.battling.battles import run_battles
 from p2lab.genetic.fitness import win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.genetic.operations import fitness_mutate, mutate, selection
-from p2lab.pokemon.battles import run_battles
 
 if TYPE_CHECKING:
     from p2lab.pokemon.teams import Team
