@@ -9,6 +9,7 @@ __all__ = (
     "import_pool",
 )
 
+import subprocess
 import sys
 from pathlib import Path
 from subprocess import check_output
@@ -16,6 +17,8 @@ from subprocess import check_output
 import numpy as np
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
+
+from p2lab.pokemon.pokefactory import PokeFactory
 
 
 class Team:
@@ -32,41 +35,68 @@ class _Builder(Teambuilder):
         pass
 
 
+def validate(poke_str, format="gen7anythinggoes"):
+    try:
+        check_output(
+            f"pokemon-showdown validate-team {format}",
+            shell=True,
+            input=poke_str,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return False
+    return True
+
+
 def generate_pool(
-    num_pokemon, format="gen7anythinggoes", export=False, filename="pool.txt"
+    num_pokemon,
+    format="gen7anythinggoes",
+    export=False,
+    filename="pool.txt",
+    use_showdown=True,
+    dexids=None,
 ):
     teams = []
     print("Generating pokemon in batches of 6 to form pool...")
     # teams are produced in batches of 6, so we need to generate
     # a multiple of 6 teams that's greater than the number of pokemon
     N_seed_teams = num_pokemon // 6 + 1
-    for _ in tqdm(range(N_seed_teams), desc="Generating teams!"):
-        poss_team = check_output(f"pokemon-showdown generate-team {format}", shell=True)
-        try:
-            check_output(
-                f"pokemon-showdown validate-team {format} ",
-                shell=True,
-                input=poss_team,
+
+    if use_showdown:
+        for _ in tqdm(range(N_seed_teams), desc="Generating teams!"):
+            poss_team = check_output(
+                f"pokemon-showdown generate-team {format}", shell=True
             )
-        except Exception as e:
-            print("Error validating team... skipping to next")
-            print(f"Error: {e}")
-            continue
-        n_team = _Builder().parse_showdown_team(
-            check_output(
-                "pokemon-showdown export-team ", input=poss_team, shell=True
-            ).decode(sys.stdout.encoding)
-        )
-        if len(n_team) != 6:
-            msg = "pokemon showdown generated a team not of length 6"
+            if not validate(poss_team, format):
+                continue
+            n_team = _Builder().parse_showdown_team(
+                check_output(
+                    "pokemon-showdown export-team ", input=poss_team, shell=True
+                ).decode(sys.stdout.encoding)
+            )
+            if len(n_team) != 6:
+                msg = "pokemon showdown generated a team not of length 6"
+                raise Exception(msg)
+            teams.append(n_team)
+        pool = np.array(teams).flatten()
+        # trim the pool to the desired number of pokemon
+        pool = pool[:num_pokemon]
+    else:  # assumption is that we homegrow some teams
+        # TODO: Perform validation here for this!
+        # TODO: Set gens here for later
+        pokefactory = PokeFactory(7)
+        if dexids is None:
+            msg = "dexids must be provided if not using showdown"
+            raise Exception()
+        if len(dexids) != num_pokemon:
+            msg = "dexids must be the same length as num_pokemon"
             raise Exception(msg)
-        teams.append(n_team)
-
-    pool = np.array(teams).flatten()
-
-    # trim the pool to the desired number of pokemon
-    pool = pool[:num_pokemon]
-
+        pool = []
+        for dexid in tqdm(dexids):
+            pot_poke = pokefactory.make_pokemon(dexid)
+            while not validate(bytes(pot_poke.formatted, "utf-8"), format):
+                pot_poke = pokefactory.make_pokemon(dexid)
+            pool.append(pot_poke)
     if export:
         with Path.open(filename, "w") as f:
             packed = "\n".join([mon.formatted for mon in pool])

@@ -7,12 +7,16 @@ import numpy as np
 
 from p2lab.genetic.genetic import genetic_algorithm
 from p2lab.pokemon.premade import gen_1_pokemon
-from p2lab.pokemon.teams import generate_teams, import_pool
+from p2lab.pokemon.teams import generate_pool, generate_teams, import_pool
 
 
-async def main_loop(num_teams, team_size, num_generations, unique):
+async def main_loop(num_teams, team_size, num_generations, unique, use_premade=False):
     # generate the pool
-    pool = import_pool(gen_1_pokemon())
+    pool = (
+        import_pool(gen_1_pokemon())
+        if use_premade
+        else generate_pool(151, use_showdown=False, dexids=np.arange(1, 152))
+    )
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
     # crossover_fn = build_crossover_fn(locus_swap, locus=0)
     # run the genetic algorithm
@@ -74,11 +78,13 @@ def parse_args():
 def main():
     args = parse_args()
 
-    if args["s"] is not None:
-        np.random.seed(args["s"])
+    if args["seed"] is not None:
+        np.random.seed(args["seed"])
 
     asyncio.get_event_loop().run_until_complete(
-        main_loop(args["n"], args["t"], args["g"], args["u"])
+        main_loop(
+            args["numteams"], args["teamsize"], args["generations"], args["unique"]
+        )
     )
 
 
