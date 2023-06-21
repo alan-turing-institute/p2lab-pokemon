@@ -6,6 +6,7 @@ This is directly inspired by poke-env's diagostic_tools folder
 """
 from __future__ import annotations
 
+import numpy as np
 from poke_env.data import GenData as POKEDEX
 from poke_env.teambuilder import TeambuilderPokemon
 
@@ -44,5 +45,23 @@ class PokeFactory:
                 allowed_moves.append(move)
         return allowed_moves
 
-    def make_pokemon(self, dexnum, **kwargs):
-        return TeambuilderPokemon(species=self.dex2mon[dexnum], **kwargs)
+    def make_pokemon(self, dexnum=None, generate_moveset=False, **kwargs):
+        """
+        kwargs are passed to the TeambuilderPokemon constructor and can include:
+        - nickname
+        - item
+        - ability
+        - moves
+        - nature
+        - evs
+        - ivs
+        - level
+        - happiness
+        - hiddenpowertype
+        - gmax
+        """
+        if dexnum is None:
+            dexnum = np.random.choice(list(self.dex2mon.keys()))
+        if generate_moveset or "moves" not in kwargs.keys():
+            moves = np.random.choice(self.get_allowed_moves(dexnum), 4, replace=False)
+        return TeambuilderPokemon(species=self.dex2mon[dexnum], moves=moves**kwargs)
