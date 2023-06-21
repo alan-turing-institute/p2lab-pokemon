@@ -60,8 +60,18 @@ class PokeFactory:
         - hiddenpowertype
         - gmax
         """
+        if dexnum < 1:
+            msg = "Dex number must be greater than 0"
+            raise ValueError(msg)
         if dexnum is None:
             dexnum = np.random.choice(list(self.dex2mon.keys()))
         if generate_moveset or "moves" not in kwargs.keys():
-            moves = np.random.choice(self.get_allowed_moves(dexnum), 4, replace=False)
-        return TeambuilderPokemon(species=self.dex2mon[dexnum], moves=moves**kwargs)
+            poss_moves = self.get_allowed_moves(dexnum)
+            moves = (
+                np.random.choice(poss_moves, 4, replace=False)
+                if len(poss_moves) > 3
+                else poss_moves
+            )
+        elif "moves" in kwargs:
+            return TeambuilderPokemon(species=self.dex2mon[dexnum], **kwargs)
+        return TeambuilderPokemon(species=self.dex2mon[dexnum], moves=moves, **kwargs)
