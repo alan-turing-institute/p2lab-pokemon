@@ -6,12 +6,14 @@ import asyncio
 import numpy as np
 
 from p2lab.genetic.genetic import genetic_algorithm
+from p2lab.pokemon.poke_factory import PokeFactory
 from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
 
 
 async def main_loop(num_teams, team_size, num_generations, unique):
     # generate the pool
+    PokeFactory()
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
     # crossover_fn = build_crossover_fn(locus_swap, locus=0)
