@@ -25,7 +25,6 @@ Pokemon = Any
 @dataclass(frozen=True)
 class Team:
     pokemon: tuple[Pokemon]
-    names: tuple[str]
 
     def __init__(self, pokemon) -> None:
         if len(pokemon) > 6:
@@ -36,7 +35,10 @@ class Team:
             msg = f"Team cannot have duplicate pokemon names: tried to create team of {names}"
             raise ValueError(msg)
         object.__setattr__(self, "pokemon", tuple(deepcopy(pokemon)))
-        object.__setattr__(self, "names", tuple(names))
+
+    @property
+    def names(self) -> tuple[str]:
+        return tuple(p.formatted.split("|")[0] for p in self.pokemon)
 
     def to_packed_str(self) -> str:
         return "]".join([mon.formatted for mon in self.pokemon])
@@ -46,6 +48,16 @@ class Team:
 
     def __getitem__(self, index: int) -> Pokemon:
         return self.pokemon[index]
+
+    def __iter__(self):
+        return iter(self.pokemon)
+
+    def __repr__(self) -> str:
+        return f"Team({self.names})"
+
+    def to_file(self, filename: str) -> None:
+        with Path.open(filename, "w") as f:
+            f.write(self.to_packed_str())
 
 
 class _Builder(Teambuilder):

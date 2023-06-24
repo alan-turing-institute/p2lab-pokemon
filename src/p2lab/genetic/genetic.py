@@ -2,6 +2,7 @@ from __future__ import annotations
 
 __all__ = ("genetic_algorithm",)
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
 import numpy as np
@@ -39,6 +40,8 @@ async def genetic_algorithm(
     player_2_name: str = "Player 2",
     print_top_teams: bool = True,
     player_log_level: int = 30,
+    write_every: int | None = None,
+    write_path: str | None = None,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -181,6 +184,18 @@ async def genetic_algorithm(
             print(f"Generation {i + 1}:")
             print(f"Top team: {teams[np.argmax(fitness)].names}")
             print(f"Top fitness: {fitness[np.argmax(fitness)]}")
+
+        if write_every is not None and i % write_every == 0:
+            if not Path.exists(write_path / f"generation_{i}"):
+                Path.mkdir(write_path / f"generation_{i}")
+            sorted_fitness = np.argsort(fitness)[::-1]
+            for j, team in enumerate(teams[sorted_fitness]):
+                team_path = Path(
+                    write_path
+                    / f"generation_{i}"
+                    / f"team_{j}_fitness_{fitness[j]:.3f}.txt"
+                )
+                team.to_file(team_path)
 
         # Run simulations
         results = await run_battles(
