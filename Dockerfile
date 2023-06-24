@@ -20,4 +20,4 @@ RUN pip install -e $P2_PATH/poke_env
 RUN npm install -g $P2_PATH/pokemon-showdown
 
 WORKDIR $P2_PATH/pokemon-showdown
-ENTRYPOINT node pokemon-showdown start --no-security && 
+ENTRYPOINT node pokemon-showdown start --no-security &&
