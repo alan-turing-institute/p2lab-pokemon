@@ -150,6 +150,8 @@ def main():
             p1=args["p1"],
             p2=args["p2"],
             battles_per_match=args["battles_per_match"],
+            write_every=args["write_every"],
+            write_path=args["write_path"],
         )
     )
 
