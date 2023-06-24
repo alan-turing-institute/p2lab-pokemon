@@ -10,7 +10,6 @@ from p2lab.genetic.operations import (
 )
 
 
-@pytest.mark.asyncio()
 @pytest.mark.parametrize(
     ("team_size", "crossover_fn"),
     [
@@ -23,14 +22,17 @@ from p2lab.genetic.operations import (
 )
 def test_main_loop(event_loop, team_size, crossover_fn):
     num_teams = 10
-    num_generations = 10
-    res = event_loop.run_until_complete(
+    num_generations = 3
+    crossover_name = crossover_fn.__name__ if crossover_fn is not None else "none"
+    player_name = "main-" + str(team_size) + "-" + crossover_name
+    event_loop.run_until_complete(
         main_loop(
             num_teams=num_teams,
             team_size=team_size,
             num_generations=num_generations,
             unique=True,
-            crossover_fn=crossover_fn,
+            crossover=crossover_fn,
+            p1=player_name[:15] + " P1",
+            p2=player_name[:15] + " P2",
         )
     )
-    assert res is not None

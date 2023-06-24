@@ -11,7 +11,7 @@ from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
 
 
-async def main_loop(num_teams, team_size, num_generations, unique, crossover):
+async def main_loop(num_teams, team_size, num_generations, unique, crossover, p1, p2):
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
@@ -27,6 +27,8 @@ async def main_loop(num_teams, team_size, num_generations, unique, crossover):
         mutate_with_fitness=crossover_fn is None,
         crossover_fn=crossover_fn,
         mutate_k=1,
+        player_1_name=p1,
+        player_2_name=p2,
     )
 
     print("Best team:")
@@ -76,6 +78,18 @@ def parse_args():
         choices=["locus", "slot", "sample"],
         default=None,
     )
+    parser.add_argument(
+        "--p1",
+        help - "Name of the first player",
+        type=str,
+        default="Player 1",
+    )
+    parser.add_argument(
+        "--p2",
+        help - "Name of the second player",
+        type=str,
+        default="Player 2",
+    )
     return vars(parser.parse_args())
 
 
@@ -91,6 +105,8 @@ def main():
             num_generations=args["generations"],
             unique=args["unique"],
             crossover=args["crossover"],
+            p1=args["p1"],
+            p2=args["p2"],
         )
     )
 

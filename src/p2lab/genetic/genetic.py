@@ -35,6 +35,8 @@ async def genetic_algorithm(
     num_generations: int = 500,
     fitness_kwargs: dict | None = None,
     progress_bars: bool = True,
+    player_1_name: str = "Player 1",
+    player_2_name: str = "Player 2",
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -88,10 +90,10 @@ async def genetic_algorithm(
     matches = match_fn(seed_teams)
 
     player_1 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 1", None), battle_format=battle_format
+        PlayerConfiguration(player_1_name, None), battle_format=battle_format
     )
     player_2 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 2", None), battle_format=battle_format
+        PlayerConfiguration(player_2_name, None), battle_format=battle_format
     )
 
     print("Generation 0:")

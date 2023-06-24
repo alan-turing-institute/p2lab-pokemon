@@ -231,6 +231,7 @@ def sample_swap(
     team2: list[str],
     num_pokemon: int,
     with_replacement: bool = False,
+    **kwargs,
 ) -> tuple(list[str], list[str]):
     """
     A method of performing the crossover. This method treats the pokemon
