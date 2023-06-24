@@ -30,9 +30,11 @@ pip install -e .
 
 - Have node installed and install showdown
   - See: https://nodejs.dev/en/learn/how-to-install-nodejs/
+
 ```bash
 npm install pokemon-showdown # -g flag might be needed on some systems
 ```
+
 ## Running
 
 To run locally start the pokemon showdown server:
