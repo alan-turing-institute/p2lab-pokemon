@@ -38,7 +38,7 @@ async def main_loop(
         progress_bars=True,
         mutate_with_fitness=crossover_fn is None,
         crossover_fn=crossover_fn,
-        mutate_k=3,
+        mutate_k=team_size - 1,
         player_1_name=p1,
         player_2_name=p2,
         battles_per_match=battles_per_match,
