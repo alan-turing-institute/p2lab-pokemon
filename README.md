@@ -35,7 +35,9 @@ pip install -e .
   - See: https://nodejs.dev/en/learn/how-to-install-nodejs/
 
 ```bash
-npm install pokemon-showdown # -g flag might be needed on some systems
+cd pokemon-showdown
+npm install  # -g flag sometimes solved problems on our machines
+cd ..
 ```
 
 ## Running
@@ -43,7 +45,6 @@ npm install pokemon-showdown # -g flag might be needed on some systems
 To run locally start the pokemon showdown server:
 
 ```bash
-cd pokemon-showdown
 node pokemon-showdown start --no-security
 ```
 
@@ -56,16 +57,24 @@ p2lab <args>
 ### Additional arguments for p2lab
 
 ```bash
-usage: p2lab [-h] [--generations GENERATIONS] [--teamsize TEAMSIZE] [--numteams NUMTEAMS] [--seed SEED] [--unique UNIQUE]
+usage: p2lab [-h] [--generations GENERATIONS]
+             [--team-size TEAM_SIZE] [--teams TEAMS]
+             [--seed SEED] [--unique UNIQUE]
 
 options:
-  -h, --help            show this help message and exit
+  -h, --help            show this help message and
+                        exit
   --generations GENERATIONS
-                        Number of generations to iterate over
-  --teamsize TEAMSIZE   Number of pokemon per team (max 6)
-  --numteams NUMTEAMS   Number of teams i.e., individuals per generation
+                        Number of generations to
+                        iterate over
+  --team-size TEAM_SIZE
+                        Number of pokemon per team
+                        (max 6)
+  --teams TEAMS         Number of teams i.e.,
+                        individuals per generation
   --seed SEED           Random seed to use
-  --unique UNIQUE       Determines if a team can have duplicate pokemon species
+  --unique UNIQUE       Determines if a team can have
+                        duplicate pokemon species
 ```
 
 ### Docker:
