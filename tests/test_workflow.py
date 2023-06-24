@@ -34,5 +34,6 @@ def test_main_loop(event_loop, team_size, crossover_fn):
             crossover=crossover_fn,
             p1=player_name[:15] + " P1",
             p2=player_name[:15] + " P2",
+            battles_per_match=3,
         )
     )

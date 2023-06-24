@@ -297,6 +297,7 @@ def mutate(
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
+    new_teams = []
     for team in teams:
         # Each team faces a random chance of mutation
         if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
@@ -308,14 +309,33 @@ def mutate(
                 k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
+            # IMPORTANT: ensure that no team has the same pokemon in it
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
-
             new_pokemon = np.random.choice(
-                pokemon_population, size=k, replace=False
+                pokemon_population,
+                size=k,
+                replace=False,  # replace would create duplicates
             )  # open to parameterising the replace
-            team.pokemon[mutate_indices] = new_pokemon
+            # check that these new pokemon are not already in the team
+            names = [p.formatted.split("|")[0] for p in new_pokemon]
+            while any(name in team.names for name in names):
+                print("Found duplicate pokemon, resampling...")
+                new_pokemon = np.random.choice(
+                    pokemon_population,
+                    size=k,
+                    replace=False,  # replace would create duplicates
+                )
+                names = [p.formatted.split("|")[0] for p in new_pokemon]
+            # Create new team with the mutated pokemon and the rest of the team
+            old_pokemon = np.array(team.pokemon)[
+                [i for i in range(num_pokemon) if i not in mutate_indices]
+            ]
+            new_team = [*new_pokemon, *old_pokemon]
+            new_teams.append(Team(new_team))
+        else:
+            new_teams.append(team)
 
-    return teams
+    return new_teams
 
 
 def fitness_mutate(

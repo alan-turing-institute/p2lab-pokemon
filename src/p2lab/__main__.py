@@ -11,7 +11,9 @@ from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
 
 
-async def main_loop(num_teams, team_size, num_generations, unique, crossover, p1, p2):
+async def main_loop(
+    num_teams, team_size, num_generations, battles_per_match, unique, crossover, p1, p2
+):
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
@@ -23,7 +25,7 @@ async def main_loop(num_teams, team_size, num_generations, unique, crossover, p1
     print(f"Team size: {team_size}")
     print(f"Number of generations: {num_generations}")
     print(f"Unique teams: {unique}")
-    print(f"Crossover: {crossover_fn.__name__ if crossover_fn is not None else 'none'}")
+    print(f"Crossover: {crossover.__name__ if crossover is not None else 'none'}")
     print(f"Player 1: {p1}")
     print(f"Player 2: {p2}")
     # run the genetic algorithm
@@ -36,9 +38,10 @@ async def main_loop(num_teams, team_size, num_generations, unique, crossover, p1
         progress_bars=True,
         mutate_with_fitness=crossover_fn is None,
         crossover_fn=crossover_fn,
-        mutate_k=1,
+        mutate_k=3,
         player_1_name=p1,
         player_2_name=p2,
+        battles_per_match=battles_per_match,
     )
 
     print("Best team:")
@@ -100,6 +103,12 @@ def parse_args():
         type=str,
         default="Player 2",
     )
+    parser.add_argument(
+        "--battles-per-match",
+        help="Number of battles per match",
+        type=int,
+        default=3,
+    )
     return vars(parser.parse_args())
 
 
@@ -117,6 +126,7 @@ def main():
             crossover=args["crossover"],
             p1=args["p1"],
             p2=args["p2"],
+            battles_per_match=args["battles_per_match"],
         )
     )
 

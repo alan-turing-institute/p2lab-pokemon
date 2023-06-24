@@ -4,6 +4,7 @@ __all__ = ("genetic_algorithm",)
 
 from typing import TYPE_CHECKING, Callable
 
+import numpy as np
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
 
@@ -16,7 +17,6 @@ if TYPE_CHECKING:
     from p2lab.pokemon.teams import Team
 
 
-# TODO: account for team size of 1
 async def genetic_algorithm(
     pokemon_pool: list[str],  # list of all valid pokemon names
     seed_teams: list[Team],  # list of teams to seed the algorithm with
@@ -37,6 +37,7 @@ async def genetic_algorithm(
     progress_bars: bool = True,
     player_1_name: str = "Player 1",
     player_2_name: str = "Player 2",
+    print_top_teams: bool = True,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -148,7 +149,6 @@ async def genetic_algorithm(
             # If mutating with fitness, skip the crossover step. Otherwise, crossover +
             # mutate.
             if mutate_with_fitness:
-                print(f"current length of teams: {len(new_teams)}")
                 teams = fitness_mutate(
                     teams=new_teams,
                     num_pokemon=team_size,
@@ -157,7 +157,6 @@ async def genetic_algorithm(
                     allow_all=allow_all,
                     k=mutate_k,
                 )
-                print(f"new length of teams: {len(teams)}")
 
             else:
                 # Mutate the new teams
@@ -173,7 +172,10 @@ async def genetic_algorithm(
         # Generate matches from list of teams
         matches = match_fn(teams)
 
-        print(f"Generation {i + 1}:")
+        if print_top_teams:
+            print(f"Generation {i + 1}:")
+            print(f"Top team: {teams[np.argmax(fitness)].names}")
+            print(f"Top fitness: {fitness[np.argmax(fitness)]}")
 
         # Run simulations
         results = await run_battles(
