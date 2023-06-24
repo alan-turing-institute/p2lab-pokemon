@@ -28,7 +28,7 @@ def selection(
     """
 
     # Sample indices with replacement to produce new teams + fitnesses
-    old_indices = list(range(num_teams))
+    old_indices = list(range(len(teams)))
     new_indices = random.choices(old_indices, k=num_teams)
 
     # New teams and fitness

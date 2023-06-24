@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from pathlib import Path
 
 import numpy as np
 
@@ -28,6 +29,10 @@ async def main_loop(
     write_every,
     write_path,
 ):
+    if write_path is not None:
+        write_path = Path(write_path)
+        if not write_path.exists():
+            write_path.mkdir()
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
@@ -142,7 +147,7 @@ def parse_args():
         "--write-path",
         help="Path to write to",
         type=str,
-        default=".",
+        default="./results",
     )
     return vars(parser.parse_args())
 

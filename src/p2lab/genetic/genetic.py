@@ -186,15 +186,18 @@ async def genetic_algorithm(
             print(f"Top fitness: {fitness[np.argmax(fitness)]}")
 
         if write_every is not None and i % write_every == 0:
-            if not Path.exists(write_path / f"generation_{i}"):
-                Path.mkdir(write_path / f"generation_{i}")
-            sorted_fitness = np.argsort(fitness)[::-1]
-            for j, team in enumerate(teams[sorted_fitness]):
-                team_path = Path(
-                    write_path
-                    / f"generation_{i}"
-                    / f"team_{j}_fitness_{fitness[j]:.3f}.txt"
+            if not Path.exists(Path(write_path) / Path(f"generation_{i}")):
+                Path.mkdir(Path(write_path) / Path(f"generation_{i}"))
+            sorted_teams = sorted(
+                teams, key=lambda x: fitness[teams.index(x)], reverse=True
+            )
+            for j, team in enumerate(sorted_teams[:5]):
+                team_path = (
+                    Path(write_path)
+                    / Path(f"generation_{i}")
+                    / Path(f"team_{j}_fitness_{fitness[j]:.3f}.txt")
                 )
+                print(team)
                 team.to_file(team_path)
 
         # Run simulations
