@@ -45,6 +45,9 @@ class PokeFactory:
                 allowed_moves.append(move)
         return allowed_moves
 
+    def get_allowed_abilities(self, dexnum):
+        return self.dex.pokedex[self.dex2mon[dexnum]]["abilities"]
+
     def make_pokemon(self, dexnum=None, generate_moveset=False, **kwargs):
         """
         kwargs are passed to the TeambuilderPokemon constructor and can include:
@@ -72,6 +75,19 @@ class PokeFactory:
                 if len(poss_moves) > 3
                 else poss_moves
             )
-        elif "moves" in kwargs:
-            return TeambuilderPokemon(species=self.dex2mon[dexnum], **kwargs)
-        return TeambuilderPokemon(species=self.dex2mon[dexnum], moves=moves, **kwargs)
+            kwargs["moves"] = moves
+        if "ivs" not in kwargs.keys():
+            ivs = [31] * 6
+            kwargs["ivs"] = ivs
+        if "evs" not in kwargs.keys():
+            # TODO: implement EV generation better
+            evs = [510 // 6] * 6
+            kwargs["evs"] = evs
+        if "level" not in kwargs.keys():
+            kwargs["level"] = 100
+        if "ability" not in kwargs.keys():
+            kwargs["ability"] = np.random.choice(
+                list(self.get_allowed_abilities(dexnum).values())
+            )
+
+        return TeambuilderPokemon(species=self.dex2mon[dexnum], **kwargs)
