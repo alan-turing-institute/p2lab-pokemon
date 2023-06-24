@@ -91,10 +91,14 @@ async def genetic_algorithm(
     matches = match_fn(seed_teams)
 
     player_1 = SimpleHeuristicsPlayer(
-        PlayerConfiguration(player_1_name, None), battle_format=battle_format
+        PlayerConfiguration(player_1_name, None),
+        battle_format=battle_format,
+        log_level=30,
     )
     player_2 = SimpleHeuristicsPlayer(
-        PlayerConfiguration(player_2_name, None), battle_format=battle_format
+        PlayerConfiguration(player_2_name, None),
+        battle_format=battle_format,
+        log_level=30,
     )
 
     print("Generation 0:")
