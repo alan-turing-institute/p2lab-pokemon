@@ -10,18 +10,30 @@ __all__ = (
 )
 
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from subprocess import check_output
+from typing import Any
 
 import numpy as np
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
+Pokemon = Any
 
+
+@dataclass(frozen=True)
 class Team:
+    pokemon: tuple[Pokemon]
+    names: tuple[str]
+
     def __init__(self, pokemon) -> None:
-        self.pokemon = np.array(deepcopy(pokemon))
-        self.first_name = self.pokemon[0].formatted.split("|")[0]
+        names = [p.formatted.split("|")[0] for p in pokemon]
+        if len(names) != len(set(names)):
+            msg = f"Team cannot have duplicate pokemon names: tried to create team of {names}"
+            raise ValueError(msg)
+        object.__setattr__(self, "pokemon", tuple(deepcopy(pokemon)))
+        object.__setattr__(self, "names", tuple(names))
 
     def to_packed_str(self) -> str:
         return "]".join([mon.formatted for mon in self.pokemon])

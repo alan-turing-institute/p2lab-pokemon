@@ -148,6 +148,7 @@ async def genetic_algorithm(
             # If mutating with fitness, skip the crossover step. Otherwise, crossover +
             # mutate.
             if mutate_with_fitness:
+                print(f"current length of teams: {len(new_teams)}")
                 teams = fitness_mutate(
                     teams=new_teams,
                     num_pokemon=team_size,
@@ -156,6 +157,7 @@ async def genetic_algorithm(
                     allow_all=allow_all,
                     k=mutate_k,
                 )
+                print(f"new length of teams: {len(teams)}")
 
             else:
                 # Mutate the new teams

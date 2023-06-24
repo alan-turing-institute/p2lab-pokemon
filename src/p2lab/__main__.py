@@ -16,6 +16,16 @@ async def main_loop(num_teams, team_size, num_generations, unique, crossover, p1
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
     crossover_fn = build_crossover_fn(crossover) if crossover is not None else None
+
+    # log the parameters
+    print("Running genetic algorithm with the following parameters:")
+    print(f"Number of teams: {num_teams}")
+    print(f"Team size: {team_size}")
+    print(f"Number of generations: {num_generations}")
+    print(f"Unique teams: {unique}")
+    print(f"Crossover: {crossover_fn.__name__ if crossover_fn is not None else 'none'}")
+    print(f"Player 1: {p1}")
+    print(f"Player 2: {p2}")
     # run the genetic algorithm
     teams, fitnesses = await genetic_algorithm(
         pokemon_pool=pool,
