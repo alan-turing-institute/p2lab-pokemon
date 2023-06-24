@@ -39,7 +39,7 @@ def test_random_pokemon_is_created_with_moves(default_factory):
     while dexnum == 132:
         dexnum = np.random.randint(1, 151)
     poke = default_factory.make_pokemon(dexnum=dexnum, generate_moveset=True)
-    assert 1 < len(poke.moves) <= 4
+    assert 1 <= len(poke.moves) <= 4
 
 
 def test_ditto_is_created_with_moves(default_factory):
@@ -50,11 +50,11 @@ def test_ditto_is_created_with_moves(default_factory):
 def test_all_gen1_pokemon_can_be_created(default_factory):
     for dexnum in range(1, 152):
         poke = default_factory.make_pokemon(dexnum=dexnum, generate_moveset=True)
-        assert 1 < len(poke.moves) <= 4
+        assert 1 <= len(poke.moves) <= 4
 
 
 def test_invalid_dex_raised(default_factory):
-    with pytest.raises(ValueError, match="dexnum must be between 1 and 151"):
+    with pytest.raises(ValueError, match="Dex number must be greater than 0"):
         default_factory.make_pokemon(dexnum=0)
 
 

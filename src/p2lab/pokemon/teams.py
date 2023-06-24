@@ -28,6 +28,9 @@ class Team:
     names: tuple[str]
 
     def __init__(self, pokemon) -> None:
+        if len(pokemon) > 6:
+            msg = f"Team cannot have more than 6 pokemon: tried to create team of {pokemon}"
+            raise ValueError(msg)
         names = [p.formatted.split("|")[0] for p in pokemon]
         if len(names) != len(set(names)):
             msg = f"Team cannot have duplicate pokemon names: tried to create team of {names}"
@@ -37,6 +40,12 @@ class Team:
 
     def to_packed_str(self) -> str:
         return "]".join([mon.formatted for mon in self.pokemon])
+
+    def __len__(self) -> int:
+        return len(self.pokemon)
+
+    def __getitem__(self, index: int) -> Pokemon:
+        return self.pokemon[index]
 
 
 class _Builder(Teambuilder):
