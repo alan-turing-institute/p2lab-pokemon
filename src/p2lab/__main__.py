@@ -12,7 +12,16 @@ from p2lab.pokemon.teams import generate_teams, import_pool
 
 
 async def main_loop(
-    num_teams, team_size, num_generations, battles_per_match, unique, crossover, p1, p2
+    num_teams,
+    team_size,
+    num_generations,
+    battles_per_match,
+    unique,
+    crossover,
+    p1,
+    p2,
+    write_every,
+    write_path,
 ):
     # generate the pool
     pool = import_pool(gen_1_pokemon())
@@ -42,6 +51,8 @@ async def main_loop(
         player_1_name=p1,
         player_2_name=p2,
         battles_per_match=battles_per_match,
+        write_every=write_every,
+        write_path=write_path,
     )
 
     print("Best team:")
@@ -108,6 +119,18 @@ def parse_args():
         help="Number of battles per match",
         type=int,
         default=3,
+    )
+    parser.add_argument(
+        "--write-every",
+        help="Write every N generations",
+        type=int,
+        default=10,
+    )
+    parser.add_argument(
+        "--write-path",
+        help="Path to write to",
+        type=str,
+        default=".",
     )
     return vars(parser.parse_args())
 
