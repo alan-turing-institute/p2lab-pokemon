@@ -6,7 +6,12 @@ import asyncio
 import numpy as np
 
 from p2lab.genetic.genetic import genetic_algorithm
-from p2lab.genetic.operations import build_crossover_fn
+from p2lab.genetic.operations import (
+    build_crossover_fn,
+    locus_swap,
+    sample_swap,
+    slot_swap,
+)
 from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
 
@@ -26,7 +31,14 @@ async def main_loop(
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
-    crossover_fn = build_crossover_fn(crossover) if crossover is not None else None
+    function_map = {
+        "sample_swap": sample_swap,
+        "slot_swap": slot_swap,
+        "locus_swap": locus_swap,
+    }
+    crossover_fn = (
+        build_crossover_fn(function_map[crossover]) if crossover is not None else None
+    )
 
     # log the parameters
     print("Running genetic algorithm with the following parameters:")
