@@ -41,10 +41,10 @@ async def test_battle_mewtwo_obliterates_eevee():
     teams = [team1, team2]
     matches = [[0, 1]]
     player_1 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 3", None), battle_format="gen7anythinggoes"
+        PlayerConfiguration("Player 1", None), battle_format="gen7anythinggoes"
     )
     player_2 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 4", None), battle_format="gen7anythinggoes"
+        PlayerConfiguration("Player 2", None), battle_format="gen7anythinggoes"
     )
     res = await run_battles(matches, teams, player_1, player_2, battles_per_match=10)
     mewtwo_wins = res[0][1]
@@ -53,7 +53,16 @@ async def test_battle_mewtwo_obliterates_eevee():
 
 
 @pytest.mark.asyncio()
-async def test_battle_eevee_pikachu_formats():
+@pytest.mark.parametrize(
+    "battle_format",
+    [
+        "gen4anythinggoes",
+        "gen6anythinggoes",
+        "gen7anythinggoes",
+        "gen8anythinggoes",
+    ],
+)
+async def test_battle_eevee_pikachu_formats(battle_format):
     p = pokefactory.PokeFactory()
     eevee = p.make_pokemon(133, moves=["tackle", "growl"], level=5)
     pikachu = p.make_pokemon(25, moves=["thundershock", "growl"], level=5)
@@ -61,21 +70,14 @@ async def test_battle_eevee_pikachu_formats():
     team2 = Team([pikachu])
     teams = [team1, team2]
     matches = [[0, 1]]
-    counter = iter(range(10, 20))
-    battle_formats = [
-        "gen4anythinggoes",
-        "gen6anythinggoes",
-        "gen7anythinggoes",
-        "gen8anythinggoes",
-    ]
-    for battle_format in battle_formats:
-        player_1 = SimpleHeuristicsPlayer(
-            PlayerConfiguration(f"Player {next(counter)}", None),
-            battle_format=battle_format,
-        )
-        player_2 = SimpleHeuristicsPlayer(
-            PlayerConfiguration(f"Player {next(counter)}", None),
-            battle_format=battle_format,
-        )
-        res = await run_battles(matches, teams, player_1, player_2, battles_per_match=1)
-        assert res is not None
+
+    player_1 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 1", None),
+        battle_format=battle_format,
+    )
+    player_2 = SimpleHeuristicsPlayer(
+        PlayerConfiguration("Player 2", None),
+        battle_format=battle_format,
+    )
+    res = await run_battles(matches, teams, player_1, player_2, battles_per_match=1)
+    assert res is not None
