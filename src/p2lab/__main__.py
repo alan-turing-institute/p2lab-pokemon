@@ -32,9 +32,9 @@ async def main_loop(
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
     function_map = {
-        "sample_swap": sample_swap,
-        "slot_swap": slot_swap,
-        "locus_swap": locus_swap,
+        "sample": sample_swap,
+        "slot": slot_swap,
+        "locus": locus_swap,
     }
     crossover_fn = (
         build_crossover_fn(function_map[crossover]) if crossover is not None else None
