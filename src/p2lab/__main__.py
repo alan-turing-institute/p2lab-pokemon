@@ -34,7 +34,7 @@ async def main_loop(
     print(f"Team size: {team_size}")
     print(f"Number of generations: {num_generations}")
     print(f"Unique teams: {unique}")
-    print(f"Crossover: {crossover.__name__ if crossover is not None else 'none'}")
+    print(f"Crossover: {crossover if crossover is not None else 'none'}")
     print(f"Player 1: {p1}")
     print(f"Player 2: {p2}")
     # run the genetic algorithm
