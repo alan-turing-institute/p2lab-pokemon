@@ -1,8 +1,11 @@
 <p align="center">
-  <img width="30%" alt="relaxed logo" src=assets/logo.png><br>
+  <img width="30%" alt="p2lab logo" src=assets/logo.png><br>
   <br>
   <a href="https://github.com/alan-turing-institute/p2lab-pokemon/actions">
     <img alt="GitHub Workflow Status" src="https://github.com/alan-turing-institute/p2lab-pokemon/workflows/CI/badge.svg">
+  </a>
+  <a href="https://codecov.io/gh/alan-turing-institute/p2lab-pokemon" > 
+    <img src="https://codecov.io/gh/alan-turing-institute/p2lab-pokemon/branch/main/graph/badge.svg?token=2U0YQV7PO6"/> 
   </a>
 </p>
 
