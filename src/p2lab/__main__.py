@@ -80,13 +80,13 @@ def parse_args():
     )
     parser.add_argument(
         "--p1",
-        help - "Name of the first player",
+        help="Name of the first player",
         type=str,
         default="Player 1",
     )
     parser.add_argument(
         "--p2",
-        help - "Name of the second player",
+        help="Name of the second player",
         type=str,
         default="Player 2",
     )
