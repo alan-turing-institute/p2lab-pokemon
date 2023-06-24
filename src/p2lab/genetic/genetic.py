@@ -38,6 +38,7 @@ async def genetic_algorithm(
     player_1_name: str = "Player 1",
     player_2_name: str = "Player 2",
     print_top_teams: bool = True,
+    player_log_level: int = 30,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -93,12 +94,12 @@ async def genetic_algorithm(
     player_1 = SimpleHeuristicsPlayer(
         PlayerConfiguration(player_1_name, None),
         battle_format=battle_format,
-        log_level=30,
+        log_level=player_log_level,
     )
     player_2 = SimpleHeuristicsPlayer(
         PlayerConfiguration(player_2_name, None),
         battle_format=battle_format,
-        log_level=30,
+        log_level=player_log_level,
     )
 
     print("Generation 0:")
