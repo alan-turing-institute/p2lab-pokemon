@@ -6,15 +6,16 @@ import asyncio
 import numpy as np
 
 from p2lab.genetic.genetic import genetic_algorithm
+from p2lab.genetic.operations import build_crossover_fn
 from p2lab.pokemon.premade import gen_1_pokemon
 from p2lab.pokemon.teams import generate_teams, import_pool
 
 
-async def main_loop(num_teams, team_size, num_generations, unique):
+async def main_loop(num_teams, team_size, num_generations, unique, crossover):
     # generate the pool
     pool = import_pool(gen_1_pokemon())
     seed_teams = generate_teams(pool, num_teams, team_size, unique=unique)
-    # crossover_fn = build_crossover_fn(locus_swap, locus=0)
+    crossover_fn = build_crossover_fn(crossover) if crossover is not None else None
     # run the genetic algorithm
     teams, fitnesses = await genetic_algorithm(
         pokemon_pool=pool,
@@ -23,7 +24,8 @@ async def main_loop(num_teams, team_size, num_generations, unique):
         team_size=team_size,
         num_generations=num_generations,
         progress_bars=True,
-        mutate_with_fitness=True,
+        mutate_with_fitness=crossover_fn is None,
+        crossover_fn=crossover_fn,
         mutate_k=1,
     )
 
@@ -54,7 +56,7 @@ def parse_args():
         default=10,
     )
     parser.add_argument(
-        "--team-size", help="Number of pokemon per team (max 6)", type=int, default=2
+        "--team-size", help="Number of pokemon per team (max 6)", type=int, default=3
     )
     parser.add_argument(
         "--teams",
@@ -67,6 +69,12 @@ def parse_args():
         "--unique",
         help="Determines if a team can have duplicate pokemon species",
         default=True,
+    )
+    parser.add_argument(
+        "--crossover",
+        help="Determines which crossover function to use",
+        choices=["locus", "slot", "sample"],
+        default=None,
     )
     return vars(parser.parse_args())
 
@@ -82,6 +90,7 @@ def main():
             team_size=args["team_size"],
             num_generations=args["generations"],
             unique=args["unique"],
+            crossover=args["crossover"],
         )
     )
 

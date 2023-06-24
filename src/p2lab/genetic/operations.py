@@ -230,21 +230,20 @@ def sample_swap(
     team1: list[str],
     team2: list[str],
     num_pokemon: int,
-    with_replacement: bool = True,
+    with_replacement: bool = False,
 ) -> tuple(list[str], list[str]):
     """
     A method of performing the crossover. This method treats the pokemon
     in the two teams as a population and samples from them to create two new
     teams.
 
-    Can be done with or without replacement. Generally more interesting with
-    replacement and so defaults to with replacement.
+    Can be done with or without replacement.
 
     Args:
         team1: List of pokemon in team 1
         team2: List of pokemon in team 2
         num_pokemon: Number of pokemon in each team
-        with_replacement: Whether to sample with our without replacement.
+        with_replacement: Whether to sample with or without replacement.
     """
 
     # Population to sample from and indices
@@ -311,7 +310,7 @@ def mutate(
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
 
             new_pokemon = np.random.choice(
-                pokemon_population, size=k, replace=True
+                pokemon_population, size=k, replace=False
             )  # open to parameterising the replace
             team.pokemon[mutate_indices] = new_pokemon
 
@@ -356,9 +355,12 @@ def fitness_mutate(
                 k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
+            # IMPORTANT: ensure that no team has the same pokemon in it
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
             new_pokemon = np.random.choice(
-                pokemon_population, size=k, replace=True
+                pokemon_population,
+                size=k,
+                replace=False,  # replace would create duplicates
             )  # open to parameterising the replace
             team.pokemon[mutate_indices] = new_pokemon
 
