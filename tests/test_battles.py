@@ -4,8 +4,8 @@ import pytest
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
 
-from p2lab.battling.battles import run_battles
 from p2lab.pokemon import pokefactory
+from p2lab.pokemon.battles import run_battles
 from p2lab.pokemon.teams import Team
 
 pytest_plugins = ("pytest_asyncio",)
