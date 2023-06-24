@@ -54,10 +54,10 @@ def parse_args():
         default=10,
     )
     parser.add_argument(
-        "--teamsize", help="Number of pokemon per team (max 6)", type=int, default=2
+        "--team-size", help="Number of pokemon per team (max 6)", type=int, default=2
     )
     parser.add_argument(
-        "--numteams",
+        "--teams",
         help="Number of teams i.e., individuals per generation",
         type=int,
         default=30,
@@ -73,12 +73,16 @@ def parse_args():
 
 def main():
     args = parse_args()
-
-    if args["s"] is not None:
-        np.random.seed(args["s"])
+    if args["seed"] is not None:
+        np.random.seed(args["seed"])
 
     asyncio.get_event_loop().run_until_complete(
-        main_loop(args["n"], args["t"], args["g"], args["u"])
+        main_loop(
+            num_teams=args["teams"],
+            team_size=args["team_size"],
+            num_generations=args["generations"],
+            unique=args["unique"],
+        )
     )
 
 
