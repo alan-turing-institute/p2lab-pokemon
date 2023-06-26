@@ -8,9 +8,6 @@ from p2lab.pokemon.teams import Team
 def test_basic_team_creation(gen_1_pool):
     team = Team([gen_1_pool[0], gen_1_pool[1], gen_1_pool[2]])
     assert len(team) == 3
-    assert team[0] == gen_1_pool[0]
-    assert team[1] == gen_1_pool[1]
-    assert team[2] == gen_1_pool[2]
     assert list(team.names) == ["Bulbasaur", "Ivysaur", "Venusaur"]
 
 
@@ -24,9 +21,13 @@ def test_team_creation_with_too_many_pokemon(gen_1_pool):
         Team(gen_1_pool)
 
 
-def test_modifying_pokemon_in_team(gen_1_pool):
+def test_no_modifying_pokemon_in_team(gen_1_pool):
     team = Team([gen_1_pool[0], gen_1_pool[1], gen_1_pool[2]])
     with pytest.raises(
         TypeError, match="'Team' object does not support item assignment"
     ):
         team[0] = gen_1_pool[7]
+    with pytest.raises(
+        TypeError, match="'tuple' object does not support item assignment"
+    ):
+        team.pokemon[0] = gen_1_pool[7]

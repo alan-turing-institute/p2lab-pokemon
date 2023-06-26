@@ -230,7 +230,6 @@ def sample_swap(
     team1: list[str],
     team2: list[str],
     num_pokemon: int,
-    with_replacement: bool = False,
     **kwargs,
 ) -> tuple(list[str], list[str]):
     """
@@ -238,13 +237,15 @@ def sample_swap(
     in the two teams as a population and samples from them to create two new
     teams.
 
-    Can be done with or without replacement.
-
     Args:
         team1: List of pokemon in team 1
         team2: List of pokemon in team 2
         num_pokemon: Number of pokemon in each team
-        with_replacement: Whether to sample with or without replacement.
+
+    Returns:
+        Two new teams
+
+    note: replacement is set to False to enforce the same pokemon cannot be in both teams
     """
 
     # Population to sample from and indices
@@ -255,23 +256,37 @@ def sample_swap(
     team1_indices = np.random.choice(
         indices,
         size=num_pokemon,
-        replace=with_replacement,
+        replace=False,
     )
 
-    # For team 2, change behaviour conditional on replacement
-    if with_replacement:
-        team2_indices = list(
-            np.random.choice(
-                indices,
-                size=num_pokemon,
-                replace=with_replacement,
-            )
+    team1_pokemon = population[team1_indices]
+    team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+
+    # Get indices for team 2, which are just the indices not in team 1
+    team2_indices = list(set(indices) - set(team1_indices))
+    team2_pokemon = population[team2_indices]
+    team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
+
+    # ensure we don't sample the same pokemon twice on either team
+    while len(set(team1_names)) != len(team1_names) or len(set(team2_names)) != len(
+        team2_names
+    ):
+        print("Found duplicate pokemon, resampling...")
+        team1_indices = np.random.choice(
+            indices,
+            size=num_pokemon,
+            replace=False,
         )
-    else:
+
+        team1_pokemon = population[team1_indices]
+        team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+
         team2_indices = list(set(indices) - set(team1_indices))
+        team2_pokemon = population[team2_indices]
+        team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
 
     # Return teams
-    return list(population[team1_indices]), list(population(team2_indices))
+    return list(team1_pokemon), list(team2_pokemon)
 
 
 ### Mutation Operations
