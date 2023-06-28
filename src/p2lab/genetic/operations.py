@@ -106,6 +106,7 @@ def build_crossover_fn(
                 )
                 team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
                 team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
+
                 while (len(set(team1_names)) != len(team1_names)) or (
                     len(set(team2_names)) != len(team2_names)
                 ):
