@@ -291,7 +291,7 @@ def sample_swap(
 def mutate(
     teams: list[Team],
     num_pokemon: int,
-    mutate_prob: float,
+    mutate_prob: float | np.ndarray,
     pokemon_population: list[str],
     allow_all: bool,
     k: int = None,
@@ -311,9 +311,14 @@ def mutate(
            be random.
     """
     new_teams = []
-    for team in teams:
+    if isinstance(mutate_prob, float):
+        mutate_prob_iter = [mutate_prob] * len(teams)
+    else:
+        mutate_prob_iter = mutate_prob
+
+    for team, prob in zip(teams, mutate_prob_iter):
         # Each team faces a random chance of mutation
-        if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
+        if np.random.choice([True, False], size=None, p=[prob, 1 - prob]):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
                 # If allow_all is true, the teams may just completely swap members
@@ -361,7 +366,8 @@ def fitness_mutate(
 ):
     """
     A mutation operation. Does the same as regular mutation, except that
-    mutate probabilites are now inverse to fitness scores.
+    mutate probabilites are now one minus the fitness of the team. This means
+    that teams with a higher fitness are less likely to mutate.
 
     Should either be used prior to crossover, or without using any kind of
     crossover.
@@ -379,7 +385,7 @@ def fitness_mutate(
     return mutate(
         teams,
         num_pokemon,
-        mutate_prob=1 / fitness,
+        mutate_prob=1 - fitness,
         pokemon_population=pokemon_population,
         allow_all=allow_all,
         k=k,
