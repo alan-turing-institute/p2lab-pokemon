@@ -104,6 +104,24 @@ def build_crossover_fn(
                     allow_all=allow_all,
                     **kwargs,
                 )
+                team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+                team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
+
+                while (len(set(team1_names)) != len(team1_names)) or (
+                    len(set(team2_names)) != len(team2_names)
+                ):
+                    print(
+                        "Found duplicate pokemon in new team from crossover, resampling..."
+                    )
+                    team1_pokemon, team2_pokemon = crossover_method(
+                        team1=team1_pokemon,
+                        team2=team2_pokemon,
+                        num_pokemon=num_pokemon,
+                        allow_all=allow_all,
+                        **kwargs,
+                    )
+                    team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+                    team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
 
             # Build new teams
             team1_new = Team(pokemon=team1_pokemon)
@@ -260,30 +278,10 @@ def sample_swap(
     )
 
     team1_pokemon = population[team1_indices]
-    team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
 
     # Get indices for team 2, which are just the indices not in team 1
     team2_indices = list(set(indices) - set(team1_indices))
     team2_pokemon = population[team2_indices]
-    team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
-
-    # ensure we don't sample the same pokemon twice on either team
-    while len(set(team1_names)) != len(team1_names) or len(set(team2_names)) != len(
-        team2_names
-    ):
-        print("Found duplicate pokemon, resampling...")
-        team1_indices = np.random.choice(
-            indices,
-            size=num_pokemon,
-            replace=False,
-        )
-
-        team1_pokemon = population[team1_indices]
-        team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
-
-        team2_indices = list(set(indices) - set(team1_indices))
-        team2_pokemon = population[team2_indices]
-        team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
 
     # Return teams
     return list(team1_pokemon), list(team2_pokemon)
@@ -293,7 +291,7 @@ def sample_swap(
 def mutate(
     teams: list[Team],
     num_pokemon: int,
-    mutate_prob: float,
+    mutate_prob: float | np.ndarray,
     pokemon_population: list[str],
     allow_all: bool,
     k: int = None,
@@ -313,9 +311,14 @@ def mutate(
            be random.
     """
     new_teams = []
-    for team in teams:
+    if isinstance(mutate_prob, float):
+        mutate_prob_iter = [mutate_prob] * len(teams)
+    else:
+        mutate_prob_iter = mutate_prob
+
+    for team, prob in zip(teams, mutate_prob_iter):
         # Each team faces a random chance of mutation
-        if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
+        if np.random.choice([True, False], size=None, p=[prob, 1 - prob]):
             # If k has not been chosen, choose randomly how many team members to mutate
             if k is None:
                 # If allow_all is true, the teams may just completely swap members
@@ -363,7 +366,8 @@ def fitness_mutate(
 ):
     """
     A mutation operation. Does the same as regular mutation, except that
-    mutate probabilites are now inverse to fitness scores.
+    mutate probabilites are now one minus the fitness of the team. This means
+    that teams with a higher fitness are less likely to mutate.
 
     Should either be used prior to crossover, or without using any kind of
     crossover.
@@ -378,45 +382,11 @@ def fitness_mutate(
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
-    new_teams = []
-
-    for index, team in enumerate(teams):
-        # Each team faces a random chance of mutation
-        if np.random.choice(
-            [True, False], size=None, p=[1 - fitness[index], fitness[index]]
-        ):
-            # If k has not been chosen, choose randomly how many team members to mutate
-            if k is None:
-                # If allow_all is true, the teams may just completely swap members
-                # or not swap at all. This changes the higher level crossover probs!
-                n = 0 if allow_all else 1
-                k = random.sample(range(n, num_pokemon - n), k=1)[0]
-
-            # Randomly swap k members of the team out with pokemon from the general pop
-            # IMPORTANT: ensure that no team has the same pokemon in it
-            mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
-            new_pokemon = np.random.choice(
-                pokemon_population,
-                size=k,
-                replace=False,  # replace would create duplicates
-            )  # open to parameterising the replace
-            # check that these new pokemon are not already in the team
-            names = [p.formatted.split("|")[0] for p in new_pokemon]
-            while any(name in team.names for name in names):
-                print("Found duplicate pokemon, resampling...")
-                new_pokemon = np.random.choice(
-                    pokemon_population,
-                    size=k,
-                    replace=False,  # replace would create duplicates
-                )
-                names = [p.formatted.split("|")[0] for p in new_pokemon]
-            # Create new team with the mutated pokemon and the rest of the team
-            old_pokemon = np.array(team.pokemon)[
-                [i for i in range(num_pokemon) if i not in mutate_indices]
-            ]
-            new_team = [*new_pokemon, *old_pokemon]
-            new_teams.append(Team(new_team))
-        else:
-            new_teams.append(team)
-
-    return new_teams
+    return mutate(
+        teams,
+        num_pokemon,
+        mutate_prob=1 - fitness,
+        pokemon_population=pokemon_population,
+        allow_all=allow_all,
+        k=k,
+    )
