@@ -10,21 +10,54 @@ __all__ = (
 )
 
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from subprocess import check_output
+from typing import Any
 
 import numpy as np
 from poke_env.teambuilder import Teambuilder
 from tqdm import tqdm
 
+Pokemon = Any
 
+
+@dataclass(frozen=True)
 class Team:
+    pokemon: tuple[Pokemon]
+
     def __init__(self, pokemon) -> None:
-        self.pokemon = np.array(deepcopy(pokemon))
-        self.first_name = self.pokemon[0].formatted.split("|")[0]
+        if len(pokemon) > 6:
+            msg = f"Team cannot have more than 6 pokemon: tried to create team of {pokemon}"
+            raise ValueError(msg)
+        names = [p.formatted.split("|")[0] for p in pokemon]
+        if len(names) != len(set(names)):
+            msg = f"Team cannot have duplicate pokemon names: tried to create team of {names}"
+            raise ValueError(msg)
+        object.__setattr__(self, "pokemon", tuple(deepcopy(pokemon)))
+
+    @property
+    def names(self) -> tuple[str]:
+        return tuple(p.formatted.split("|")[0] for p in self.pokemon)
 
     def to_packed_str(self) -> str:
         return "]".join([mon.formatted for mon in self.pokemon])
+
+    def __len__(self) -> int:
+        return len(self.pokemon)
+
+    def __getitem__(self, index: int) -> Pokemon:
+        return self.pokemon[index]
+
+    def __iter__(self):
+        return iter(self.pokemon)
+
+    def __repr__(self) -> str:
+        return f"Team({self.names})"
+
+    def to_file(self, filename: str) -> None:
+        with Path.open(filename, "w") as f:
+            f.write(self.to_packed_str())
 
 
 class _Builder(Teambuilder):

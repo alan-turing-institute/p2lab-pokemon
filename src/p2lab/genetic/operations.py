@@ -28,7 +28,7 @@ def selection(
     """
 
     # Sample indices with replacement to produce new teams + fitnesses
-    old_indices = list(range(num_teams))
+    old_indices = list(range(len(teams)))
     new_indices = random.choices(old_indices, k=num_teams)
 
     # New teams and fitness
@@ -230,21 +230,22 @@ def sample_swap(
     team1: list[str],
     team2: list[str],
     num_pokemon: int,
-    with_replacement: bool = True,
+    **kwargs,
 ) -> tuple(list[str], list[str]):
     """
     A method of performing the crossover. This method treats the pokemon
     in the two teams as a population and samples from them to create two new
     teams.
 
-    Can be done with or without replacement. Generally more interesting with
-    replacement and so defaults to with replacement.
-
     Args:
         team1: List of pokemon in team 1
         team2: List of pokemon in team 2
         num_pokemon: Number of pokemon in each team
-        with_replacement: Whether to sample with our without replacement.
+
+    Returns:
+        Two new teams
+
+    note: replacement is set to False to enforce the same pokemon cannot be in both teams
     """
 
     # Population to sample from and indices
@@ -255,23 +256,37 @@ def sample_swap(
     team1_indices = np.random.choice(
         indices,
         size=num_pokemon,
-        replace=with_replacement,
+        replace=False,
     )
 
-    # For team 2, change behaviour conditional on replacement
-    if with_replacement:
-        team2_indices = list(
-            np.random.choice(
-                indices,
-                size=num_pokemon,
-                replace=with_replacement,
-            )
+    team1_pokemon = population[team1_indices]
+    team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+
+    # Get indices for team 2, which are just the indices not in team 1
+    team2_indices = list(set(indices) - set(team1_indices))
+    team2_pokemon = population[team2_indices]
+    team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
+
+    # ensure we don't sample the same pokemon twice on either team
+    while len(set(team1_names)) != len(team1_names) or len(set(team2_names)) != len(
+        team2_names
+    ):
+        print("Found duplicate pokemon, resampling...")
+        team1_indices = np.random.choice(
+            indices,
+            size=num_pokemon,
+            replace=False,
         )
-    else:
+
+        team1_pokemon = population[team1_indices]
+        team1_names = [p.formatted.split("|")[0] for p in team1_pokemon]
+
         team2_indices = list(set(indices) - set(team1_indices))
+        team2_pokemon = population[team2_indices]
+        team2_names = [p.formatted.split("|")[0] for p in team2_pokemon]
 
     # Return teams
-    return list(population[team1_indices]), list(population(team2_indices))
+    return list(team1_pokemon), list(team2_pokemon)
 
 
 ### Mutation Operations
@@ -297,6 +312,7 @@ def mutate(
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
+    new_teams = []
     for team in teams:
         # Each team faces a random chance of mutation
         if np.random.choice([True, False], size=None, p=[mutate_prob, 1 - mutate_prob]):
@@ -308,14 +324,33 @@ def mutate(
                 k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
+            # IMPORTANT: ensure that no team has the same pokemon in it
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
-
             new_pokemon = np.random.choice(
-                pokemon_population, size=k, replace=True
+                pokemon_population,
+                size=k,
+                replace=False,  # replace would create duplicates
             )  # open to parameterising the replace
-            team.pokemon[mutate_indices] = new_pokemon
+            # check that these new pokemon are not already in the team
+            names = [p.formatted.split("|")[0] for p in new_pokemon]
+            while any(name in team.names for name in names):
+                print("Found duplicate pokemon, resampling...")
+                new_pokemon = np.random.choice(
+                    pokemon_population,
+                    size=k,
+                    replace=False,  # replace would create duplicates
+                )
+                names = [p.formatted.split("|")[0] for p in new_pokemon]
+            # Create new team with the mutated pokemon and the rest of the team
+            old_pokemon = np.array(team.pokemon)[
+                [i for i in range(num_pokemon) if i not in mutate_indices]
+            ]
+            new_team = [*new_pokemon, *old_pokemon]
+            new_teams.append(Team(new_team))
+        else:
+            new_teams.append(team)
 
-    return teams
+    return new_teams
 
 
 def fitness_mutate(
@@ -343,6 +378,8 @@ def fitness_mutate(
         k: Number of team members to mutate. If set to None, this number will
            be random.
     """
+    new_teams = []
+
     for index, team in enumerate(teams):
         # Each team faces a random chance of mutation
         if np.random.choice(
@@ -356,10 +393,30 @@ def fitness_mutate(
                 k = random.sample(range(n, num_pokemon - n), k=1)[0]
 
             # Randomly swap k members of the team out with pokemon from the general pop
+            # IMPORTANT: ensure that no team has the same pokemon in it
             mutate_indices = np.random.choice(range(num_pokemon), size=k, replace=False)
             new_pokemon = np.random.choice(
-                pokemon_population, size=k, replace=True
+                pokemon_population,
+                size=k,
+                replace=False,  # replace would create duplicates
             )  # open to parameterising the replace
-            team.pokemon[mutate_indices] = new_pokemon
+            # check that these new pokemon are not already in the team
+            names = [p.formatted.split("|")[0] for p in new_pokemon]
+            while any(name in team.names for name in names):
+                print("Found duplicate pokemon, resampling...")
+                new_pokemon = np.random.choice(
+                    pokemon_population,
+                    size=k,
+                    replace=False,  # replace would create duplicates
+                )
+                names = [p.formatted.split("|")[0] for p in new_pokemon]
+            # Create new team with the mutated pokemon and the rest of the team
+            old_pokemon = np.array(team.pokemon)[
+                [i for i in range(num_pokemon) if i not in mutate_indices]
+            ]
+            new_team = [*new_pokemon, *old_pokemon]
+            new_teams.append(Team(new_team))
+        else:
+            new_teams.append(team)
 
-    return teams
+    return new_teams

@@ -1,61 +1,36 @@
 from __future__ import annotations
 
-import numpy as np
 import pytest
 
-from p2lab.genetic.genetic import genetic_algorithm
-from p2lab.genetic.operations import (
-    build_crossover_fn,
-)
-from p2lab.pokemon.premade import gen_1_pokemon
-from p2lab.pokemon.teams import generate_teams, import_pool
+from p2lab.__main__ import main_loop
 
 
-@pytest.mark.asyncio()
 @pytest.mark.parametrize(
-    ("team_size", "crossover_fn"),
+    ("team_size", "crossover_string"),
     [
         (1, None),
-        # (2, None),
-        # (6, locus_swap),
-        # (6, slot_swap),
-        # (6, sample_swap),
+        (2, None),
+        (6, "locus"),
+        (6, "slot"),
+        (6, "sample"),
     ],
 )
-async def test_main_loop(team_size, crossover_fn):
+def test_main_loop(event_loop, team_size, crossover_string):
     num_teams = 10
-    # generate the pool
-    pool = import_pool(gen_1_pokemon())
-    seed_teams = generate_teams(pool, num_teams, team_size, unique=True)
-    crossover_fn = (
-        build_crossover_fn(crossover_fn) if crossover_fn is not None else None
+    num_generations = 3
+    crossover_name = crossover_string if crossover_string is not None else "none"
+    player_name = "main-" + str(team_size) + "-" + crossover_name
+    event_loop.run_until_complete(
+        main_loop(
+            num_teams=num_teams,
+            team_size=team_size,
+            num_generations=num_generations,
+            unique=True,
+            crossover=crossover_string,
+            p1=player_name[:15] + " P1",
+            p2=player_name[:15] + " P2",
+            battles_per_match=3,
+            write_every=None,
+            write_path=None,
+        )
     )
-    # run the genetic algorithm
-    teams, fitnesses = await genetic_algorithm(
-        pokemon_pool=pool,
-        seed_teams=seed_teams,
-        num_teams=num_teams,
-        team_size=team_size,
-        num_generations=3,
-        progress_bars=True,
-        crossover_fn=crossover_fn,
-        mutate_with_fitness=crossover_fn is None,
-        mutate_k=1,
-    )
-
-    print("Best team:")
-    best_team = teams[np.argmax(fitnesses)]
-    fitness = fitnesses[np.argmax(fitnesses)]
-    for mon in best_team.pokemon:
-        print(mon.formatted)
-
-    print(f"Fitness: {fitness}")
-
-    print("Worst team:")
-
-    worst_team = teams[np.argmin(fitnesses)]
-    fitness = fitnesses[np.argmin(fitnesses)]
-    for mon in worst_team.pokemon:
-        print(mon.formatted)
-
-    print(f"Fitness: {fitness}")

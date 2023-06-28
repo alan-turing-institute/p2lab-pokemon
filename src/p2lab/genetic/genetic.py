@@ -2,8 +2,10 @@ from __future__ import annotations
 
 __all__ = ("genetic_algorithm",)
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
+import numpy as np
 from poke_env import PlayerConfiguration
 from poke_env.player import SimpleHeuristicsPlayer
 
@@ -16,7 +18,6 @@ if TYPE_CHECKING:
     from p2lab.pokemon.teams import Team
 
 
-# TODO: account for team size of 1
 async def genetic_algorithm(
     pokemon_pool: list[str],  # list of all valid pokemon names
     seed_teams: list[Team],  # list of teams to seed the algorithm with
@@ -35,6 +36,12 @@ async def genetic_algorithm(
     num_generations: int = 500,
     fitness_kwargs: dict | None = None,
     progress_bars: bool = True,
+    player_1_name: str = "Player 1",
+    player_2_name: str = "Player 2",
+    print_top_teams: bool = True,
+    player_log_level: int = 30,
+    write_every: int | None = None,
+    write_path: str | None = None,
 ) -> Team:
     """
     A genetic evolution algorithm for optimising pokemon team selection.
@@ -88,10 +95,14 @@ async def genetic_algorithm(
     matches = match_fn(seed_teams)
 
     player_1 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 1", None), battle_format=battle_format
+        PlayerConfiguration(player_1_name, None),
+        battle_format=battle_format,
+        log_level=player_log_level,
     )
     player_2 = SimpleHeuristicsPlayer(
-        PlayerConfiguration("Player 2", None), battle_format=battle_format
+        PlayerConfiguration(player_2_name, None),
+        battle_format=battle_format,
+        log_level=player_log_level,
     )
 
     print("Generation 0:")
@@ -169,7 +180,25 @@ async def genetic_algorithm(
         # Generate matches from list of teams
         matches = match_fn(teams)
 
-        print(f"Generation {i + 1}:")
+        if print_top_teams:
+            print(f"Generation {i + 1}:")
+            print(f"Top team: {teams[np.argmax(fitness)].names}")
+            print(f"Top fitness: {fitness[np.argmax(fitness)]}")
+
+        if write_every is not None and i % write_every == 0:
+            if not Path.exists(Path(write_path) / Path(f"generation_{i}")):
+                Path.mkdir(Path(write_path) / Path(f"generation_{i}"))
+            sorted_teams = sorted(
+                teams, key=lambda x: fitness[teams.index(x)], reverse=True
+            )
+            for j, team in enumerate(sorted_teams[:5]):
+                team_path = (
+                    Path(write_path)
+                    / Path(f"generation_{i}")
+                    / Path(f"team_{j}_fitness_{fitness[j]:.3f}.txt")
+                )
+                print(team)
+                team.to_file(team_path)
 
         # Run simulations
         results = await run_battles(
