@@ -145,8 +145,9 @@ async def genetic_algorithm(
             # Only do this step if not mutating with fitness, as fitness scores become
             # invalid after crossover if doing so
             if not mutate_with_fitness:
-                new_teams = crossover_fn(
+                new_teams, new_fitness = crossover_fn(
                     teams=new_teams,
+                    fitness=new_fitness,
                     num_teams=num_teams,
                     num_pokemon=team_size,
                     crossover_prob=crossover_prob,
