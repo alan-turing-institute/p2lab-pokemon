@@ -1,7 +1,7 @@
 from python
 
 RUN apt-get update
-RUN apt-get upgrade
+RUN apt-get upgrade -y
 RUN apt-get install nodejs npm -y
 
 ENV ROOT_DIR=/home
@@ -19,5 +19,9 @@ RUN pip install -e $P2_PATH/poke_env
 
 RUN npm install -g $P2_PATH/pokemon-showdown
 
+COPY ./entrypoint.sh $P2_PATH/pokemon-showdown/entrypoint.sh
+RUN chmod +x $P2_PATH/pokemon-showdown/entrypoint.sh
+
 WORKDIR $P2_PATH/pokemon-showdown
-ENTRYPOINT node pokemon-showdown start --no-security &&
+
+ENTRYPOINT $P2_PATH/pokemon-showdown/entrypoint.sh
