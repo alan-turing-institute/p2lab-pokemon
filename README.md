@@ -79,10 +79,11 @@ options:
 
 ### Docker:
 
-Alternatively, using docker: `docker build -t p2:latest .`
-`docker run -it p2:latest` `docker exec -it your_container_id /bin/bash`
+Alternatively, using docker: `docker build -t p2:latest docker/`
+`docker run -it -v <path-to-config>.yaml:/home/p2lab-pokemon/config.yaml p2`
 
-Run docker build with `--no-cache` to rebuild with newer versions of the repos.
+The docker image is built to start a server and run `p2lab` with the config
+mounted at the root of the repo.
 
 ## Components used
 
