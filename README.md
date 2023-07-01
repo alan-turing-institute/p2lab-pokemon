@@ -80,9 +80,10 @@ options:
 ### Docker:
 
 Alternatively, using docker: `docker build -t p2:latest docker/`
-`docker run -it p2:latest`
+`docker run -it -v <path-to-config>.yaml:/home/p2lab-pokemon/config.yaml p2`
 
-The docker image is built to start a server and run `p2lab`.
+The docker image is built to start a server and run `p2lab` with the config
+mounted at the root of the repo.
 
 ## Components used
 

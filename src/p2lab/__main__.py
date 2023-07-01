@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import os
 from pathlib import Path
 
 import numpy as np
+import yaml
 
 from p2lab.genetic.genetic import genetic_algorithm
 from p2lab.genetic.operations import (
@@ -90,6 +92,16 @@ async def main_loop(
     print(f"Fitness: {fitness}")
 
 
+def load_config_file(config_filepath):
+    """
+    Helper function that reads a yaml file and returns its contents as a dict.
+    Args:
+        :param config_filepath: str, a path pointing to the yaml config.
+    """
+    with Path.open(config_filepath) as yaml_config:
+        return yaml.load(yaml_config, Loader=yaml.Loader)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -153,7 +165,7 @@ def parse_args():
 
 
 def main():
-    args = parse_args()
+    args = load_config_file(os.environ["CONFIG_PATH"])
     if args["seed"] is not None:
         np.random.seed(args["seed"])
 

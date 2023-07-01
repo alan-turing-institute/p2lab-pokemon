@@ -1,0 +1,11 @@
+generations: 10 # Number of generations to iterate over
+team_size: 3 # Number of pokemon per team (max 6)
+teams: 30 # Number of teams i.e., individuals per generation
+seed: # Random seed to use
+unique: True # Determines if a team can have duplicate pokemon species
+crossover: # Determines which crossover function to use
+p1: "Player 1" # Name of the first player
+p2: "Player 2" # Name of the second player
+battles_per_match: 3 # Number of battles per match
+write_every: 10 # Write every N generations
+write_path: "./results" # Path to write to

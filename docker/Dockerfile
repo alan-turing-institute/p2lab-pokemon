@@ -24,4 +24,6 @@ RUN chmod +x $P2_PATH/pokemon-showdown/entrypoint.sh
 
 WORKDIR $P2_PATH/pokemon-showdown
 
+ENV CONFIG_PATH=$P2_PATH/config.yaml
+
 ENTRYPOINT $P2_PATH/pokemon-showdown/entrypoint.sh
