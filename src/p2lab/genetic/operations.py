@@ -55,6 +55,7 @@ def build_crossover_fn(
 
     def crossover_fn(
         teams: list[Team],
+        fitness: np.ndarray,
         num_teams: int,
         num_pokemon: int,
         crossover_prob: float,
@@ -135,8 +136,9 @@ def build_crossover_fn(
         # best to run an even number of teams lol
         if num_teams % 2 != 0:
             new_teams.pop()
+            fitness = fitness[:-1]
 
-        return new_teams
+        return new_teams, fitness
 
     return crossover_fn
 
