@@ -5,11 +5,11 @@ import time
 from itertools import permutations
 
 import numpy as np
+from p2lab.team import Team
 
 from p2lab.genetic.fitness import BTmodel, win_percentages
 from p2lab.genetic.matching import dense
 from p2lab.genetic.operations import build_crossover_fn, mutate, slot_swap
-from p2lab.team import Team
 
 # Constants
 N_TEAM = 3
